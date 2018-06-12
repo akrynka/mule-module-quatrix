@@ -1,0 +1,7 @@
+<!-- BEGIN_INCLUDE(quatrix:my-processor) -->
+    <quatrix:my-processor content="#[map-payload:content]" />
+<!-- END_INCLUDE(quatrix:my-processor) -->
+
+<!-- BEGIN_INCLUDE(quatrix:home-metadata) -->
+    <quatrix:home-metadata content="#[map-payload:content]" />
+<!-- END_INCLUDE(quatrix:home-metadata) -->
