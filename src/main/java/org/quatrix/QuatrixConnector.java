@@ -36,9 +36,8 @@ import java.util.stream.Collectors;
  *
  * @author MuleSoft, Inc.
  */
-@Connector(name="quatrix", schemaVersion="1.0-SNAPSHOT", friendlyName="quatrix")
-public class QuatrixConnector
-{
+@Connector(name = "quatrix", schemaVersion = "1.0-SNAPSHOT", friendlyName = "quatrix")
+public class QuatrixConnector {
 
     //TODO: move to config class
     //A @Configurable field can not repeat the name of any parameter that belongs to the @Connect method
@@ -134,14 +133,24 @@ public class QuatrixConnector
         return this.quatrixApi.copyFiles(req);
     }
 
-    //TODO: implement
+    /**
+     *  Create directory.
+     *
+     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:create-dir}
+     *
+     * @param target destination directory
+     * @param name name directory
+     * @param resolve if 'true' then possible name conflict will be resolved automatically
+     * @return {@link FileResp}
+     * @throws MuleException if Quatrix API is not available or network issues
+     */
     @Processor
-    public void createDir() {
-
-    }
-
-    public String getUsername() {
-        return username;
+    public FileResp createDir(UUID target, String name, @Optional @Default("true") Boolean resolve) throws MuleException {
+        MakeDirReq body = new MakeDirReq();
+        body.setTarget(target);
+        body.setName(name);
+        body.setResolve(resolve);
+        return this.quatrixApi.createDir(body);
     }
 
     public void setUsername(String username) {
