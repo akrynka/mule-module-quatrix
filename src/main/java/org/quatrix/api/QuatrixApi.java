@@ -18,7 +18,7 @@ public interface QuatrixApi {
 
     FileRenameResp renameFile(UUID uuid, FileRenameReq body) throws QuatrixApiException;
 
-    IdsResp deleteFile(IdsReq req) throws QuatrixApiException;
+    IdsResp deleteFiles(IdsReq req) throws QuatrixApiException;
 
     FileResp createDir(MakeDirReq req) throws QuatrixApiException;
 
