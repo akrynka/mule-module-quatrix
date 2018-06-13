@@ -90,7 +90,7 @@ public class QuatrixConnector
     /**
      *  Get user home directory metadata.
      *
-     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:home-metadata}
+     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:file-rename}
      *
      * @param uuid
      * @param name
