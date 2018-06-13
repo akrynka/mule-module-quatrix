@@ -87,6 +87,17 @@ public class QuatrixConnector
         return this.quatrixApi.getHomeDirMeta(content);
     }
 
+    /**
+     *  Get user home directory metadata.
+     *
+     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:home-metadata}
+     *
+     * @param uuid
+     * @param name
+     * @param resolve if 'true' rename file operation will be resolved
+     * @return {@link FileMetadataGetResp}
+     * @throws FileRenameResp if Quatrix API is not available or network issues
+     */
     @Processor
     public FileRenameResp renameFile(UUID uuid, String name, @Optional @Default("true") Boolean resolve) throws MuleException {
         FileRenameReq body = new FileRenameReq();
