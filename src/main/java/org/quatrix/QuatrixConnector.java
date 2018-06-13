@@ -12,6 +12,8 @@ package org.quatrix;
 
 import io.swagger.client.ApiClient;
 import io.swagger.client.model.FileMetadataGetResp;
+import io.swagger.client.model.IdsReq;
+import io.swagger.client.model.IdsResp;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.ConnectionStrategy;
@@ -26,6 +28,9 @@ import org.quatrix.api.QuatrixApiImpl;
 import org.quatrix.strategy.QuatrixConnectorConnectionStrategy;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Cloud Connector
@@ -39,12 +44,12 @@ public class QuatrixConnector
     //TODO: move to config class
     //A @Configurable field can not repeat the name of any parameter that belongs to the @Connect method
 //    @Configurable
-    private String username;
+    private String username = "alexeykrynka@gmail.com";
 
     //TODO: move to config class
     //A @Configurable field can not repeat the name of any parameter that belongs to the @Connect method
 //    @Configurable
-    private String password;
+    private String password = " Quatrix_Connector";
 
     private QuatrixApi quatrixApi;
 
@@ -90,10 +95,21 @@ public class QuatrixConnector
 
     }
 
-    //TODO: implement
+    /**
+     *  Delete files.
+     *
+     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:home-metadata}
+     *
+     * @param ids
+     * @return {@link IdsResp}
+     * @throws MuleException if Quatrix API is not available or network issues
+     */
     @Processor
-    public void deleteFile() {
+    public IdsResp deleteFiles(List<String> ids) throws MuleException {
+        IdsReq req = new IdsReq();
+        req.setIds(ids.stream().map(id -> UUID.fromString(id)).collect(Collectors.toList()));
 
+        return this.quatrixApi.deleteFiles(req);
     }
 
     //TODO: implement

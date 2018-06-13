@@ -79,9 +79,12 @@ public final class QuatrixApiImpl implements QuatrixApi {
     }
 
     @Override
-    public IdsResp deleteFile(IdsReq req) throws QuatrixApiException {
-        //TODO: implement
-        return null;
+    public IdsResp deleteFiles(IdsReq req) throws QuatrixApiException {
+        try {
+            return this.fileApi.fileDeletePost(req);
+        } catch (ApiException e) {
+            throw asQuatrixException(e);
+        }
     }
 
     @Override
