@@ -119,7 +119,7 @@ public class QuatrixConnector
      *
      * @param ids list of files
      * @param target destination directory
-     * @param resolve if 'true' rename file operation will be resolved
+     * @param resolve if 'true' then possible name conflict will be resolved automatically
      *
      * @return {@link JobResp}
      *
