@@ -116,6 +116,17 @@ public class QuatrixConnector {
 
     }
 
+    /**
+     *  Get user home directory metadata.
+     *
+     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:create-dir}
+     *
+     * @param target destination directory
+     * @param name name directory
+     * @param resolve resolve if 'true' rename file operation will be resolved
+     * @return {@link FileResp}
+     * @throws MuleException if Quatrix API is not available or network issues
+     */
     @Processor
     public FileResp createDir(UUID target, String name, @Optional @Default("true") Boolean resolve) throws MuleException {
         MakeDirReq body = new MakeDirReq();
