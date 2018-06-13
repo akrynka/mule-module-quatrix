@@ -86,8 +86,11 @@ public final class QuatrixApiImpl implements QuatrixApi {
 
     @Override
     public FileResp createDir(MakeDirReq req) throws QuatrixApiException {
-        //TODO: implement
-        return null;
+        try {
+            return this.fileApi.fileMakedirPost(req);
+        } catch (ApiException e) {
+            throw asQuatrixException(e);
+        }
     }
 
     @Override
