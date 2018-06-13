@@ -12,9 +12,7 @@ package org.quatrix;
 
 import com.google.common.base.Function;
 import io.swagger.client.ApiClient;
-import io.swagger.client.model.FileMetadataGetResp;
-import io.swagger.client.model.IdsReq;
-import io.swagger.client.model.IdsResp;
+import io.swagger.client.model.*;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.ConnectionStrategy;
 import org.mule.api.annotations.Connector;
@@ -31,7 +29,6 @@ import org.quatrix.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Cloud Connector
@@ -107,7 +104,12 @@ public class QuatrixConnector {
     @Processor
     public IdsResp deleteFiles(List<String> ids) throws MuleException {
         IdsReq req = new IdsReq();
-        req.setIds(ids.stream().map(id -> UUID.fromString(id)).collect(Collectors.toList()));
+        req.setIds(CollectionUtils.map(ids, new Function<String, UUID>() {
+            @Override
+            public UUID apply(String s) {
+                return UUID.fromString(s);
+            }
+        }));
 
         return this.quatrixApi.deleteFiles(req);
     }
