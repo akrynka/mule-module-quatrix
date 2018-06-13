@@ -10,10 +10,9 @@
  */
 package org.quatrix;
 
+import com.google.common.base.Function;
 import io.swagger.client.ApiClient;
-import io.swagger.client.model.CopyMoveFilesReq;
-import io.swagger.client.model.FileMetadataGetResp;
-import io.swagger.client.model.JobResp;
+import io.swagger.client.model.*;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.ConnectionStrategy;
 import org.mule.api.annotations.Connector;
@@ -25,11 +24,11 @@ import org.mule.api.annotations.param.Optional;
 import org.quatrix.api.QuatrixApi;
 import org.quatrix.api.QuatrixApiImpl;
 import org.quatrix.strategy.QuatrixConnectorConnectionStrategy;
+import org.quatrix.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Cloud Connector
@@ -127,7 +126,13 @@ public class QuatrixConnector {
     @Processor
     public JobResp copyFiles(List<String> ids, UUID target, @Optional @Default("true") Boolean resolve) throws MuleException {
         CopyMoveFilesReq req = new CopyMoveFilesReq();
-        req.setIds(ids.stream().map(id -> UUID.fromString(id)).collect(Collectors.toList()));
+
+        req.setIds(CollectionUtils.map(ids, new Function<String, UUID>() {
+            @Override
+            public UUID apply(String s) {
+                return UUID.fromString(s);
+            }
+        }));
         req.setTarget(target);
         req.setResolve(resolve);
         return this.quatrixApi.copyFiles(req);
