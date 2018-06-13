@@ -12,7 +12,6 @@
     <quatrix:config-type name="config" username="foo" password="foo"/>
 
     <flow name="testFlow">
-        <quatrix:my-processor content="Another string" config-ref="config"/>
         <quatrix:get-home-metadata content="1" config-ref="config"/>
     </flow>
 
