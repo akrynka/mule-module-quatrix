@@ -98,7 +98,7 @@ public class QuatrixConnector
     /**
      *  Delete files.
      *
-     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:home-metadata}
+     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:files-delete}
      *
      * @param ids
      * @return {@link IdsResp}
