@@ -88,21 +88,21 @@ public class QuatrixConnector
     }
 
     /**
-     *  Get user home directory metadata.
+     *  Rename file.
      *
      *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:file-rename}
      *
      * @param uuid
      * @param name
-     * @param resolve if 'true' rename file operation will be resolved
+     * @param resolve if 'true' then possible name conflict will be resolved automatically
      * @return {@link FileRenameResp}
      * @throws MuleException if Quatrix API is not available or network issues
      */
     @Processor
     public FileRenameResp renameFile(UUID uuid, String name, @Optional @Default("true") Boolean resolve) throws MuleException {
-        FileRenameReq body = new FileRenameReq();
-        body.setName(name);
-        body.setResolve(resolve);
+        FileRenameReq body = new FileRenameReq()
+                .name(name)
+                .resolve(resolve);
 
         return this.quatrixApi.renameFile(uuid, body);
     }
