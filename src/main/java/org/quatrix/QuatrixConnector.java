@@ -12,6 +12,8 @@ package org.quatrix;
 
 import io.swagger.client.ApiClient;
 import io.swagger.client.model.FileMetadataGetResp;
+import io.swagger.client.model.FileRenameReq;
+import io.swagger.client.model.FileRenameResp;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.ConnectionStrategy;
@@ -26,6 +28,7 @@ import org.quatrix.api.QuatrixApiImpl;
 import org.quatrix.strategy.QuatrixConnectorConnectionStrategy;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 /**
  * Cloud Connector
@@ -84,10 +87,13 @@ public class QuatrixConnector
         return this.quatrixApi.getHomeDirMeta(content);
     }
 
-    //TODO: implement
     @Processor
-    public void renameFile() {
+    public FileRenameResp renameFile(UUID uuid, String name, @Optional @Default("true") Boolean resolve) throws MuleException {
+        FileRenameReq body = new FileRenameReq();
+        body.setName(name);
+        body.setResolve(resolve);
 
+        return this.quatrixApi.renameFile(uuid, body);
     }
 
     //TODO: implement
