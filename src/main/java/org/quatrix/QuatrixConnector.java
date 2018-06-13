@@ -90,7 +90,7 @@ public class QuatrixConnector
     /**
      *  Rename file.
      *
-     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:file-rename}
+     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:rename-file}
      *
      * @param uuid
      * @param name
