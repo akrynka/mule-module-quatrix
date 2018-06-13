@@ -74,8 +74,11 @@ public final class QuatrixApiImpl implements QuatrixApi {
 
     @Override
     public FileRenameResp renameFile(UUID uuid, FileRenameReq body) throws QuatrixApiException {
-        //TODO: implement
-        return null;
+        try {
+            return this.fileApi.fileRenameIdPost(uuid, body);
+        } catch (ApiException e) {
+            throw asQuatrixException(e);
+        }
     }
 
     @Override

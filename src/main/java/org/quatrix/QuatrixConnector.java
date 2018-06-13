@@ -12,7 +12,9 @@ package org.quatrix;
 
 import com.google.common.base.Function;
 import io.swagger.client.ApiClient;
-import io.swagger.client.model.*;
+import io.swagger.client.model.FileMetadataGetResp;
+import io.swagger.client.model.FileRenameReq;
+import io.swagger.client.model.FileRenameResp;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.ConnectionStrategy;
 import org.mule.api.annotations.Connector;
@@ -27,7 +29,6 @@ import org.quatrix.strategy.QuatrixConnectorConnectionStrategy;
 import org.quatrix.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -86,10 +87,24 @@ public class QuatrixConnector {
         return this.quatrixApi.getHomeDirMeta(content);
     }
 
-    //TODO: implement
+    /**
+     *  Rename file.
+     *
+     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:rename-file}
+     *
+     * @param uuid
+     * @param name
+     * @param resolve if 'true' then possible name conflict will be resolved automatically
+     * @return {@link FileRenameResp}
+     * @throws MuleException if Quatrix API is not available or network issues
+     */
     @Processor
-    public void renameFile() {
+    public FileRenameResp renameFile(UUID uuid, String name, @Optional @Default("true") Boolean resolve) throws MuleException {
+        FileRenameReq body = new FileRenameReq()
+                .name(name)
+                .resolve(resolve);
 
+        return this.quatrixApi.renameFile(uuid, body);
     }
 
     /**
