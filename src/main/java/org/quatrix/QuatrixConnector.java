@@ -49,7 +49,7 @@ public class QuatrixConnector
     //TODO: move to config class
     //A @Configurable field can not repeat the name of any parameter that belongs to the @Connect method
 //    @Configurable
-    private String password = " Quatrix_Connector";
+    private String password = "Quatrix_Connector";
 
     private QuatrixApi quatrixApi;
 
@@ -98,7 +98,7 @@ public class QuatrixConnector
     /**
      *  Delete files.
      *
-     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:files-delete}
+     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:delete-files}
      *
      * @param ids
      * @return {@link IdsResp}
