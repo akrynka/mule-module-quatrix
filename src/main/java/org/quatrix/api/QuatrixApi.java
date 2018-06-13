@@ -22,7 +22,7 @@ public interface QuatrixApi {
 
     FileResp createDir(MakeDirReq req) throws QuatrixApiException;
 
-    JobResp copyFile(CopyMoveFilesReq req) throws QuatrixApiException;
+    JobResp copyFiles(CopyMoveFilesReq req) throws QuatrixApiException;
 
     void close() throws QuatrixApiException;
 }
