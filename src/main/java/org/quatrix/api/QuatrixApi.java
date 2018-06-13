@@ -18,11 +18,11 @@ public interface QuatrixApi {
 
     FileRenameResp renameFile(UUID uuid, FileRenameReq body) throws QuatrixApiException;
 
-    IdsResp deleteFile(IdsReq req) throws QuatrixApiException;
+    IdsResp deleteFiles(IdsReq req) throws QuatrixApiException;
 
     FileResp createDir(MakeDirReq req) throws QuatrixApiException;
 
-    JobResp copyFile(CopyMoveFilesReq req) throws QuatrixApiException;
+    JobResp copyFiles(CopyMoveFilesReq req) throws QuatrixApiException;
 
     void close() throws QuatrixApiException;
 }

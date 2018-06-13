@@ -82,21 +82,30 @@ public final class QuatrixApiImpl implements QuatrixApi {
     }
 
     @Override
-    public IdsResp deleteFile(IdsReq req) throws QuatrixApiException {
-        //TODO: implement
-        return null;
+    public IdsResp deleteFiles(IdsReq req) throws QuatrixApiException {
+        try {
+            return this.fileApi.fileDeletePost(req);
+        } catch (ApiException e) {
+            throw asQuatrixException(e);
+        }
     }
 
     @Override
     public FileResp createDir(MakeDirReq req) throws QuatrixApiException {
-        //TODO: implement
-        return null;
+        try {
+            return this.fileApi.fileMakedirPost(req);
+        } catch (ApiException e) {
+            throw asQuatrixException(e);
+        }
     }
 
     @Override
-    public JobResp copyFile(CopyMoveFilesReq req) throws QuatrixApiException {
-        //TODO: implement
-        return null;
+    public JobResp copyFiles(CopyMoveFilesReq req) throws QuatrixApiException {
+        try {
+            return this.fileApi.fileCopyPost(req);
+        } catch (ApiException e) {
+            throw asQuatrixException(e);
+        }
     }
 
     @Override
