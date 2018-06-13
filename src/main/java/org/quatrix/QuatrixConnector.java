@@ -95,8 +95,8 @@ public class QuatrixConnector
      * @param uuid
      * @param name
      * @param resolve if 'true' rename file operation will be resolved
-     * @return {@link FileMetadataGetResp}
-     * @throws FileRenameResp if Quatrix API is not available or network issues
+     * @return {@link FileRenameResp}
+     * @throws MuleException if Quatrix API is not available or network issues
      */
     @Processor
     public FileRenameResp renameFile(UUID uuid, String name, @Optional @Default("true") Boolean resolve) throws MuleException {
