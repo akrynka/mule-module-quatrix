@@ -12,9 +12,7 @@ package org.quatrix;
 
 import com.google.common.base.Function;
 import io.swagger.client.ApiClient;
-import io.swagger.client.model.FileMetadataGetResp;
-import io.swagger.client.model.FileRenameReq;
-import io.swagger.client.model.FileRenameResp;
+import io.swagger.client.model.*;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.ConnectionStrategy;
 import org.mule.api.annotations.Connector;
@@ -29,6 +27,7 @@ import org.quatrix.strategy.QuatrixConnectorConnectionStrategy;
 import org.quatrix.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -93,15 +92,15 @@ public class QuatrixConnector {
      *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:rename-file}
      *
      * @param uuid
-     * @param name
+     * @param newFileName
      * @param resolve if 'true' then possible name conflict will be resolved automatically
      * @return {@link FileRenameResp}
      * @throws MuleException if Quatrix API is not available or network issues
      */
     @Processor
-    public FileRenameResp renameFile(UUID uuid, String name, @Optional @Default("true") Boolean resolve) throws MuleException {
+    public FileRenameResp renameFile(UUID uuid, String newFileName, @Optional @Default("true") Boolean resolve) throws MuleException {
         FileRenameReq body = new FileRenameReq()
-                .name(name)
+                .name(newFileName)
                 .resolve(resolve);
 
         return this.quatrixApi.renameFile(uuid, body);
@@ -118,13 +117,13 @@ public class QuatrixConnector {
      */
     @Processor
     public IdsResp deleteFiles(List<String> ids) throws MuleException {
-        IdsReq req = new IdsReq();
-        req.setIds(CollectionUtils.map(ids, new Function<String, UUID>() {
-            @Override
-            public UUID apply(String s) {
-                return UUID.fromString(s);
-            }
-        }));
+        IdsReq req = new IdsReq()
+                .ids(CollectionUtils.map(ids, new Function<String, UUID>() {
+                    @Override
+                    public UUID apply(String s) {
+                        return UUID.fromString(s);
+                    }
+                }));
 
         return this.quatrixApi.deleteFiles(req);
     }
@@ -156,16 +155,16 @@ public class QuatrixConnector {
      */
     @Processor
     public JobResp copyFiles(List<String> ids, UUID target, @Optional @Default("true") Boolean resolve) throws MuleException {
-        CopyMoveFilesReq req = new CopyMoveFilesReq();
+        CopyMoveFilesReq req = new CopyMoveFilesReq()
+                .ids(CollectionUtils.map(ids, new Function<String, UUID>() {
+                    @Override
+                    public UUID apply(String s) {
+                        return UUID.fromString(s);
+                    }
+                }))
+                .target(target)
+                .resolve(resolve);
 
-        req.setIds(CollectionUtils.map(ids, new Function<String, UUID>() {
-            @Override
-            public UUID apply(String s) {
-                return UUID.fromString(s);
-            }
-        }));
-        req.setTarget(target);
-        req.setResolve(resolve);
         return this.quatrixApi.copyFiles(req);
     }
 
@@ -175,17 +174,18 @@ public class QuatrixConnector {
      *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:create-dir}
      *
      * @param target destination directory
-     * @param name name directory
+     * @param dirName name directory
      * @param resolve if 'true' then possible name conflict will be resolved automatically
      * @return {@link FileResp}
      * @throws MuleException if Quatrix API is not available or network issues
      */
     @Processor
-    public FileResp createDir(UUID target, String name, @Optional @Default("true") Boolean resolve) throws MuleException {
-        MakeDirReq body = new MakeDirReq();
-        body.setTarget(target);
-        body.setName(name);
-        body.setResolve(resolve);
+    public FileResp createDir(UUID target, String dirName, @Optional @Default("true") Boolean resolve) throws MuleException {
+        MakeDirReq body = new MakeDirReq()
+                .target(target)
+                .name(dirName)
+                .resolve(resolve);
+
         return this.quatrixApi.createDir(body);
     }
 
