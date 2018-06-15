@@ -11,19 +11,24 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public final class QuatrixApiImpl implements QuatrixApi {
-    private static final long KEEP_ALIVE_DELAY = 5;
+
+    private static final long KEEP_ALIVE_DELAY = 5L;
+
+    ScheduledExecutorService keepAliveCallExecutor
+            = Executors.newSingleThreadScheduledExecutor();
+
+    private ScheduledFuture<?> keepAliveCallFuture;
 
     /**
      * General API client which makes all real calls to an API. <br />
      */
-    private final ApiClient apiClient;
-    private final ScheduledExecutorService keepAliveCallExecutor
-            = Executors.newSingleThreadScheduledExecutor();
-    private final AuthApi authApi;
-    private final FileApi fileApi;
+    final ApiClient apiClient;
+    final AuthApi authApi;
+    final FileApi fileApi;
 
     private UUID sessionId = null;
 
@@ -33,12 +38,20 @@ public final class QuatrixApiImpl implements QuatrixApi {
         this.fileApi = new FileApi(apiClient);
     }
 
+    public QuatrixApiImpl(AuthApi auth, FileApi fileApi, ApiClient apiClient) {
+        this.apiClient = apiClient;
+        this.authApi = auth;
+        this.fileApi = fileApi;
+    }
+
     @Override
     public SessionLoginResp login() throws QuatrixApiException {
         if (sessionId == null) {
             try {
                 SessionLoginResp response = this.authApi.sessionLoginGet();
-                setupKeepAliveCallback(KEEP_ALIVE_DELAY, TimeUnit.SECONDS);
+                sessionId = response.getSessionId();
+
+                setupKeepAliveCallback(KEEP_ALIVE_DELAY, TimeUnit.MINUTES);
 
                 return response;
             } catch (ApiException e) {
@@ -51,7 +64,13 @@ public final class QuatrixApiImpl implements QuatrixApi {
 
     @Override
     public void logout() throws QuatrixApiException {
-        //TODO: implement
+        try {
+            this.authApi.sessionLogoutGet();
+        } catch (ApiException e) {
+            throw asQuatrixException(e);
+        } finally {
+            cancelKeepAliveCallback();
+        }
     }
 
     @Override
@@ -128,8 +147,8 @@ public final class QuatrixApiImpl implements QuatrixApi {
         return new QuatrixApiException(ex);
     }
 
-    private void setupKeepAliveCallback(long delay, TimeUnit timeUnit) {
-        keepAliveCallExecutor.scheduleAtFixedRate(new Runnable() {
+    protected void setupKeepAliveCallback(long delay, TimeUnit timeUnit) {
+       keepAliveCallFuture = keepAliveCallExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -139,5 +158,11 @@ public final class QuatrixApiImpl implements QuatrixApi {
                 }
             }
         }, delay, delay, timeUnit);
+    }
+
+    private void cancelKeepAliveCallback() {
+        if (keepAliveCallFuture != null) {
+            keepAliveCallFuture.cancel(true);
+        }
     }
 }
