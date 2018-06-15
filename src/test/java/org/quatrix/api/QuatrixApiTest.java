@@ -47,7 +47,7 @@ public class QuatrixApiTest {
 
     @Test
     public void testDeleteFiles() throws QuatrixApiException, ApiException {
-        IdsReq req = new IdsReq();
+        final IdsReq req = new IdsReq();
 
         Mockito.when(fileApi.fileDeletePost(req)).thenReturn(new IdsResp().ids(req.getIds()));
         IdsResp response = api.deleteFiles(req);
