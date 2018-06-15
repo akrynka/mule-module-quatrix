@@ -4,6 +4,8 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.AuthApi;
 import io.swagger.client.api.FileApi;
+import io.swagger.client.model.IdsReq;
+import io.swagger.client.model.IdsResp;
 import io.swagger.client.model.SessionLoginResp;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,5 +43,15 @@ public class QuatrixApiTest {
 
         Mockito.verify(executorService).scheduleAtFixedRate(
                 Mockito.any(Runnable.class), Mockito.any(Long.class), Mockito.any(Long.class), Mockito.any(TimeUnit.class));
+    }
+
+    @Test
+    public void testDeleteFiles() throws QuatrixApiException, ApiException {
+        IdsReq req = new IdsReq();
+
+        Mockito.when(fileApi.fileDeletePost(req)).thenReturn(new IdsResp().ids(req.getIds()));
+        IdsResp response = api.deleteFiles(req);
+
+        Assert.assertEquals(req.getIds(), response.getIds());
     }
 }
