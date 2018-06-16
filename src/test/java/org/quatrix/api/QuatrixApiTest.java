@@ -81,4 +81,15 @@ public class QuatrixApiTest {
 
         Assert.assertEquals(req.getIds(), response.getIds());
     }
+
+    @Test
+    public void testRenameFile() throws QuatrixApiException, ApiException {
+        final UUID testUuid = UUID.randomUUID();
+        FileRenameReq testBody = new FileRenameReq();
+
+        Mockito.when(fileApi.fileRenameIdPost(testUuid, testBody)).thenReturn(new FileRenameResp().id(testUuid));
+        FileRenameResp response = api.renameFile(testUuid, testBody);
+
+        Assert.assertEquals(testUuid, response.getId());
+    }
 }
