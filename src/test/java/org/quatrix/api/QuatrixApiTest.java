@@ -4,15 +4,13 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.AuthApi;
 import io.swagger.client.api.FileApi;
-import io.swagger.client.model.FileResp;
-import io.swagger.client.model.MakeDirReq;
-import io.swagger.client.model.SessionLoginResp;
+import io.swagger.client.model.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -58,5 +56,20 @@ public class QuatrixApiTest {
         Assert.assertEquals(testUuid, fileResp.getId());
         Assert.assertEquals(dirName, fileResp.getName());
 
+    }
+
+    @Test
+    public void testFileCopy() throws QuatrixApiException, ApiException {
+        final UUID testId = UUID.randomUUID();
+        final UUID testTarget = UUID.randomUUID();
+        final CopyMoveFilesReq req = new CopyMoveFilesReq();
+
+        req.setIds(Collections.singletonList(testId));
+        req.setTarget(testTarget);
+
+        Mockito.when(fileApi.fileCopyPost(req)).thenReturn(new JobResp().jobId(testId));
+        JobResp response = api.copyFiles(req);
+
+        Assert.assertEquals(testId, response.getJobId());
     }
 }
