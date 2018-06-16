@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.io.File;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -45,6 +45,44 @@ public class QuatrixApiTest {
     }
 
     @Test
+    public void testCreateDir() throws QuatrixApiException, ApiException {
+        final UUID testUuid = UUID.randomUUID();
+        final String dirName = "testName";
+        MakeDirReq request = new MakeDirReq();
+
+        Mockito.when(fileApi.fileMakedirPost(request)).thenReturn(new FileResp().id(testUuid).name(dirName));
+        FileResp fileResp = api.createDir(request);
+
+        Assert.assertEquals(testUuid, fileResp.getId());
+        Assert.assertEquals(dirName, fileResp.getName());
+    }
+
+    @Test
+    public void testFileCopy() throws QuatrixApiException, ApiException {
+        final UUID testId = UUID.randomUUID();
+        final UUID testTarget = UUID.randomUUID();
+        final CopyMoveFilesReq req = new CopyMoveFilesReq();
+
+        req.setIds(Collections.singletonList(testId));
+        req.setTarget(testTarget);
+
+        Mockito.when(fileApi.fileCopyPost(req)).thenReturn(new JobResp().jobId(testId));
+        JobResp response = api.copyFiles(req);
+
+        Assert.assertEquals(testId, response.getJobId());
+    }
+
+    @Test
+    public void testDeleteFiles() throws QuatrixApiException, ApiException {
+        final IdsReq req = new IdsReq();
+
+        Mockito.when(fileApi.fileDeletePost(req)).thenReturn(new IdsResp().ids(req.getIds()));
+        IdsResp response = api.deleteFiles(req);
+
+        Assert.assertEquals(req.getIds(), response.getIds());
+    }
+
+    @Test
     public void testRenameFile() throws QuatrixApiException, ApiException {
         final UUID testUuid = UUID.randomUUID();
         FileRenameReq testBody = new FileRenameReq();
@@ -54,5 +92,4 @@ public class QuatrixApiTest {
 
         Assert.assertEquals(testUuid, response.getId());
     }
-
 }
