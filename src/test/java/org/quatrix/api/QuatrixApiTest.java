@@ -55,7 +55,6 @@ public class QuatrixApiTest {
 
         Assert.assertEquals(testUuid, fileResp.getId());
         Assert.assertEquals(dirName, fileResp.getName());
-
     }
 
     @Test
@@ -71,5 +70,15 @@ public class QuatrixApiTest {
         JobResp response = api.copyFiles(req);
 
         Assert.assertEquals(testId, response.getJobId());
+    }
+
+    @Test
+    public void testDeleteFiles() throws QuatrixApiException, ApiException {
+        final IdsReq req = new IdsReq();
+
+        Mockito.when(fileApi.fileDeletePost(req)).thenReturn(new IdsResp().ids(req.getIds()));
+        IdsResp response = api.deleteFiles(req);
+
+        Assert.assertEquals(req.getIds(), response.getIds());
     }
 }
