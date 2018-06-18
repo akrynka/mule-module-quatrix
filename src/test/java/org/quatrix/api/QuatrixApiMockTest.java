@@ -43,22 +43,12 @@ public class QuatrixApiMockTest {
         apiClient.setBasePath("http://localhost:9000");
         apiClient.setUsername("alexeykrynka@gmail.com");
         apiClient.setPassword("Quatrix_Connector");
+
         fileApi.setApiClient(apiClient);
         authApi.setApiClient(apiClient);
+
         Mockito.reset(executorService);
         api.keepAliveCallExecutor = executorService;
-    }
-
-    @Test
-    public void testLogin() throws QuatrixApiException, ApiException {
-        final UUID testUuid = UUID.randomUUID();
-
-        Mockito.when(authApi.sessionLoginGet()).thenReturn(new SessionLoginResp().sessionId(testUuid));
-        SessionLoginResp response = api.login();
-
-        Assert.assertEquals(testUuid, response.getSessionId());
-
-
     }
 
     @Test
@@ -70,11 +60,12 @@ public class QuatrixApiMockTest {
                 .request("/login/session/login")
                     .withMethod("GET")
                     .withHeader("\"Content-type\", \"application/json\""))
-                .respond(HttpResponse.response()
+                .respond(HttpResponse
+                    .response()
                     .withStatusCode(200)
                     .withBody(gson
-                                .toJson(new SessionLoginResp()
-                                .sessionId(testUuid))));
+                        .toJson(new SessionLoginResp()
+                        .sessionId(testUuid))));
 
         SessionLoginResp response = api.login();
 
