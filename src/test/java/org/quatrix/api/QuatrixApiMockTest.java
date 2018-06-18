@@ -54,10 +54,9 @@ public class QuatrixApiMockTest {
     @Test
     public void testSuccessfulLogin() throws QuatrixApiException, ApiException {
         final UUID testUuid = UUID.randomUUID();
-        api.apiClient.setBasePath(api.apiClient.getBasePath() + "/login");
 
         mockServerClient.when(HttpRequest
-                .request("/login/session/login")
+                .request("/session/login")
                     .withMethod("GET")
                     .withHeader("\"Content-type\", \"application/json\""))
                 .respond(HttpResponse
