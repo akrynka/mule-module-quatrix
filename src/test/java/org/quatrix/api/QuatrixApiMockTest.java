@@ -2,29 +2,20 @@ package org.quatrix.api;
 
 import com.google.gson.Gson;
 import io.swagger.client.ApiClient;
-import io.swagger.client.ApiException;
 import io.swagger.client.api.AuthApi;
 import io.swagger.client.api.FileApi;
 import io.swagger.client.model.*;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.mockserver.client.server.MockServerClient;
 import org.mockserver.junit.MockServerRule;
-import org.mockserver.model.Header;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
-import org.mockserver.verify.VerificationTimes;
 
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 
 public class QuatrixApiMockTest {
@@ -33,7 +24,6 @@ public class QuatrixApiMockTest {
     private AuthApi authApi = new AuthApi();
     private FileApi fileApi = new FileApi();
     private QuatrixApiImpl api = new QuatrixApiImpl(authApi, fileApi, apiClient);
-    private ScheduledExecutorService executorService = Mockito.mock(ScheduledExecutorService.class);
     private Gson gson = new Gson();
     private MockServerClient mockServerClient;
 
@@ -41,16 +31,13 @@ public class QuatrixApiMockTest {
     public MockServerRule mockServerRule = new MockServerRule(this, 9000);
 
     @Before
-    public void init(){
+    public void init() {
         apiClient.setBasePath("http://localhost:9000");
         apiClient.setUsername("alexeykrynka@gmail.com");
         apiClient.setPassword("Quatrix_Connector");
 
         fileApi.setApiClient(apiClient);
         authApi.setApiClient(apiClient);
-
-        Mockito.reset(executorService);
-        api.keepAliveCallExecutor = executorService;
 
         mockServerClient.reset();
     }
@@ -66,9 +53,8 @@ public class QuatrixApiMockTest {
                 .respond(HttpResponse
                         .response()
                         .withStatusCode(200)
-                        .withBody(gson
-                                .toJson(new SessionLoginResp()
-                                        .sessionId(testUuid))));
+                        .withBody(gson.toJson(new SessionLoginResp()
+                                .sessionId(testUuid))));
 
         SessionLoginResp response = api.login();
         assertThat(testUuid, equalTo(response.getSessionId()));
@@ -87,9 +73,8 @@ public class QuatrixApiMockTest {
                 .respond(HttpResponse
                         .response()
                         .withStatusCode(207)
-                        .withBody(gson
-                                .toJson(new SessionLoginResp()
-                                        .sessionId(testUuid))));
+                        .withBody(gson.toJson(new SessionLoginResp()
+                                .sessionId(testUuid))));
 
         SessionLoginResp response = api.login();
         assertThat(testUuid, equalTo(response.getSessionId()));
@@ -97,7 +82,6 @@ public class QuatrixApiMockTest {
 
     @Test(expected = QuatrixApiException.class)
     public void testLoginUnauthorized() throws QuatrixApiException {
-        final UUID testUuid = UUID.randomUUID();
         apiClient.setPassword(null);
 
         mockServerClient.when(HttpRequest
@@ -123,26 +107,21 @@ public class QuatrixApiMockTest {
                 .respond(HttpResponse
                         .response()
                         .withStatusCode(200)
-                        .withBody(gson
-                                .toJson(new FileRenameResp().id(testUuid))));
+                        .withBody(gson.toJson(new FileRenameResp().id(testUuid))));
 
         FileRenameResp response = api.renameFile(testUuid, testBody);
         assertThat(testUuid, equalTo(response.getId()));
     }
 
     @Test(expected = QuatrixApiException.class)
-
     public void testRenameFileBadRequest() throws QuatrixApiException {
         final UUID testUuid = UUID.randomUUID();
-        FileRenameReq testBody = new FileRenameReq().name("FileName").resolve(true);
+        FileRenameReq testBody = new FileRenameReq();
 
         mockServerClient.when(HttpRequest
                 .request("/file/rename/" + testUuid)
                 .withMethod("POST")
-                .withHeader("Content-type", "application/json; charset=utf-8")
-                .withBody(gson.toJson(new FileRenameReq()
-                        .name("FileName")
-                        .resolve(true))))
+                .withHeader("Content-type", "application/json; charset=utf-8"))
                 .respond(HttpResponse
                         .response()
                         .withStatusCode(400));
@@ -153,7 +132,6 @@ public class QuatrixApiMockTest {
     @Test(expected = QuatrixApiException.class)
     public void testRenameFileUnauthorized() throws QuatrixApiException {
         final UUID testUuid = UUID.randomUUID();
-        FileRenameReq testBody = new FileRenameReq();
         apiClient.setPassword(null);
 
         mockServerClient.when(HttpRequest
@@ -164,7 +142,7 @@ public class QuatrixApiMockTest {
                         .response()
                         .withStatusCode(401));
 
-        FileRenameResp response = api.renameFile(testUuid, testBody);
+        FileRenameResp response = api.renameFile(testUuid, new FileRenameReq());
     }
 
     @Test
@@ -178,8 +156,7 @@ public class QuatrixApiMockTest {
                 .respond(HttpResponse
                         .response()
                         .withStatusCode(200)
-                        .withBody(gson
-                                .toJson(req)));
+                        .withBody(gson.toJson(req)));
 
         IdsResp response = api.deleteFiles(req);
         assertThat(req.getIds(), equalTo(response.getIds()));
@@ -196,8 +173,7 @@ public class QuatrixApiMockTest {
                 .respond(HttpResponse
                         .response()
                         .withStatusCode(202)
-                        .withBody(gson
-                                .toJson(req)));
+                        .withBody(gson.toJson(req)));
 
         IdsResp response = api.deleteFiles(req);
         assertThat(req.getIds(), equalTo(response.getIds()));
@@ -246,8 +222,7 @@ public class QuatrixApiMockTest {
                 .respond(HttpResponse
                         .response()
                         .withStatusCode(201)
-                        .withBody(gson
-                                .toJson(new FileResp().id(testUuid))));
+                        .withBody(gson.toJson(new FileResp().id(testUuid))));
 
         FileResp response = api.createDir(req);
         assertThat(testUuid, equalTo(response.getId()));
@@ -297,8 +272,7 @@ public class QuatrixApiMockTest {
                 .respond(HttpResponse
                         .response()
                         .withStatusCode(202)
-                        .withBody(gson
-                                .toJson(new JobResp().jobId(testId))));
+                        .withBody(gson.toJson(new JobResp().jobId(testId))));
 
         JobResp response = api.copyFiles(req);
 
@@ -307,7 +281,6 @@ public class QuatrixApiMockTest {
 
     @Test(expected = QuatrixApiException.class)
     public void testFileCopyBadRequest() throws QuatrixApiException {
-        final UUID testId = UUID.randomUUID();
         CopyMoveFilesReq req = new CopyMoveFilesReq();
 
         mockServerClient.when(HttpRequest
@@ -323,7 +296,6 @@ public class QuatrixApiMockTest {
 
     @Test(expected = QuatrixApiException.class)
     public void testFileCopyUnauthorized() throws QuatrixApiException {
-        final UUID testId = UUID.randomUUID();
         CopyMoveFilesReq req = new CopyMoveFilesReq();
 
         mockServerClient.when(HttpRequest
@@ -337,7 +309,7 @@ public class QuatrixApiMockTest {
         JobResp response = api.copyFiles(req);
     }
 
-    private List<UUID> insertIds(){
+    private List<UUID> insertIds() {
         List<UUID> listFilesForDelete = new ArrayList<>();
 
         for (int i = 0; i < 11; i++) {
