@@ -23,6 +23,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 
 public class QuatrixApiMockTest {
@@ -52,24 +53,65 @@ public class QuatrixApiMockTest {
     }
 
     @Test
-    public void testSuccessfulLogin() throws QuatrixApiException, ApiException {
+    public void testSuccessfulLogin() throws QuatrixApiException {
         final UUID testUuid = UUID.randomUUID();
 
         mockServerClient.when(HttpRequest
                 .request("/session/login")
-                    .withMethod("GET")
-                    .withHeader("\"Content-type\", \"application/json\""))
+                .withMethod("GET")
+                .withHeader("\"Content-type\", \"application/json\""))
                 .respond(HttpResponse
-                    .response()
-                    .withStatusCode(200)
-                    .withBody(gson
-                        .toJson(new SessionLoginResp()
-                        .sessionId(testUuid))));
+                        .response()
+                        .withStatusCode(200)
+                        .withBody(gson
+                                .toJson(new SessionLoginResp()
+                                        .sessionId(testUuid))));
 
         SessionLoginResp response = api.login();
-
         assertThat(testUuid, equalTo(response.getSessionId()));
     }
+
+    @Test
+    public void testMFARequiredLogin() throws QuatrixApiException {
+        final UUID testUuid = UUID.randomUUID();
+        apiClient.setUsername(null);
+        apiClient.setPassword(null);
+
+        mockServerClient.when(HttpRequest
+                .request("/session/login")
+                .withMethod("GET")
+                .withHeader("\"Content-type\", \"application/json\""))
+                .respond(HttpResponse
+                        .response()
+                        .withStatusCode(207)
+                        .withBody(gson
+                                .toJson(new SessionLoginResp()
+                                        .sessionId(testUuid))));
+
+        SessionLoginResp response = api.login();
+        assertThat(testUuid, equalTo(response.getSessionId()));
+    }
+
+    @Test(expected = QuatrixApiException.class)
+    public void testUnauthorizedLogin() throws QuatrixApiException {
+        final UUID testUuid = UUID.randomUUID();
+        apiClient.setUsername("alexeykrynka@gmail.com");
+        apiClient.setPassword(null);
+
+        mockServerClient.when(HttpRequest
+                .request("/session/login")
+                .withMethod("GET")
+                .withHeader("\"Content-type\", \"application/json\""))
+                .respond(HttpResponse
+                        .response()
+                        .withStatusCode(401)
+                        .withBody(gson
+                                .toJson(new SessionLoginResp()
+                                        .sessionId(testUuid))));
+
+        SessionLoginResp response = api.login();
+    }
+
 
 }
 
