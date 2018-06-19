@@ -61,7 +61,7 @@ public class QuatrixApiTest {
     public void testFileCopy() throws QuatrixApiException, ApiException {
         final UUID testId = UUID.randomUUID();
         final UUID testTarget = UUID.randomUUID();
-        final CopyMoveFilesReq req = new CopyMoveFilesReq();
+        CopyMoveFilesReq req = new CopyMoveFilesReq();
 
         req.setIds(Collections.singletonList(testId));
         req.setTarget(testTarget);
@@ -74,7 +74,7 @@ public class QuatrixApiTest {
 
     @Test
     public void testDeleteFiles() throws QuatrixApiException, ApiException {
-        final IdsReq req = new IdsReq();
+        IdsReq req = new IdsReq();
 
         Mockito.when(fileApi.fileDeletePost(req)).thenReturn(new IdsResp().ids(req.getIds()));
         IdsResp response = api.deleteFiles(req);
