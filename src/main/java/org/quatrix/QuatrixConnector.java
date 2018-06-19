@@ -11,22 +11,23 @@
 package org.quatrix;
 
 import com.google.common.base.Function;
-import io.swagger.client.ApiClient;
 import io.swagger.client.model.*;
 import org.mule.api.MuleException;
-import org.mule.api.annotations.ConnectionStrategy;
+import org.mule.api.annotations.Config;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.quatrix.api.QuatrixApi;
-import org.quatrix.api.QuatrixApiImpl;
+import org.quatrix.model.*;
 import org.quatrix.strategy.QuatrixConnectorConnectionStrategy;
 import org.quatrix.util.CollectionUtils;
 
-import java.math.BigDecimal;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,22 +54,11 @@ public class QuatrixConnector {
     /**
      * Connection Strategy
      */
-    @ConnectionStrategy
+    @Config
     QuatrixConnectorConnectionStrategy connectionStrategy;
 
-    /**
-     * This method initiates quatrix api client and setup basic auth params.
-     */
-    @Start
-    public void init() {
-        ApiClient apiClient = new ApiClient();
-        apiClient.setUsername(username);
-        apiClient.setPassword(password);
-        this.quatrixApi = new QuatrixApiImpl(apiClient);
-    }
-
     @Stop
-    public void onStop() throws MuleException {
+    public void onStop() {
         this.quatrixApi.close();
     }
 
@@ -82,7 +72,7 @@ public class QuatrixConnector {
      * @throws MuleException if Quatrix API is not available or network issues
      */
     @Processor
-    public FileMetadataGetResp getHomeMetadata(@Optional @Default("1") BigDecimal content) throws MuleException {
+    public FileMetadata getHomeMetadata(@Optional @Default("true") Boolean content) throws MuleException {
         return this.quatrixApi.getHomeDirMeta(content);
     }
 
@@ -95,15 +85,11 @@ public class QuatrixConnector {
      * @param newFileName
      * @param resolve if 'true' then possible name conflict will be resolved automatically
      * @return {@link FileRenameResp}
-     * @throws MuleException if Quatrix API is not available or network issues
+     * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
-    public FileRenameResp renameFile(UUID uuid, String newFileName, @Optional @Default("true") Boolean resolve) throws MuleException {
-        FileRenameReq body = new FileRenameReq()
-                .name(newFileName)
-                .resolve(resolve);
-
-        return this.quatrixApi.renameFile(uuid, body);
+    public FileRenameResult renameFile(UUID uuid, String newFileName, @Optional @Default("true") Boolean resolve) {
+        return this.quatrixApi.renameFile(uuid, newFileName, resolve);
     }
 
     /**
@@ -113,31 +99,57 @@ public class QuatrixConnector {
      *
      * @param ids
      * @return {@link IdsResp}
-     * @throws MuleException if Quatrix API is not available or network issues
+     * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
-    public IdsResp deleteFiles(List<String> ids) throws MuleException {
-        IdsReq req = new IdsReq()
-                .ids(CollectionUtils.map(ids, new Function<String, UUID>() {
-                    @Override
-                    public UUID apply(String s) {
-                        return UUID.fromString(s);
-                    }
-                }));
-
-        return this.quatrixApi.deleteFiles(req);
+    public FileIds deleteFiles(List<String> ids) {
+        return this.quatrixApi.deleteFiles(CollectionUtils.map(ids, new Function<String, UUID>() {
+            @Override
+            public UUID apply(String s) {
+                return UUID.fromString(s);
+            }
+        }));
     }
 
-    //TODO: implement
+    /**
+     *  Download single or multiple files. If defined more than 1 file will get ZIP archive.
+     *
+     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:download-file}
+     *
+     * @param fileIds File ids for download
+     * @param path Destination path on local filesystem
+     * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
+     */
     @Processor
-    public void downloadFile() {
+    public void downloadFile(List<String> fileIds, String path) throws IOException {
+        File file = this.quatrixApi.download(CollectionUtils.map(fileIds, new Function<String, UUID>() {
+            @Override
+            public UUID apply(String s) {
+                return UUID.fromString(s);
+            }
+        }));
 
+        Files.move(file.toPath(), Paths.get(path));
     }
 
-    //TODO: implement
+    /**
+     *  Upload single file.
+     *
+     *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:download-file}
+     *
+     * @param filePath File path on local file system
+     * @param parentId Id of target folder where file should be placed
+     * @param fileName File name
+     * @param resolveConflict if true then API automatically resolve any file name conflicts
+     * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
+     */
     @Processor
-    public void uploadFile() {
-
+    public void uploadFile(String filePath, String parentId, String fileName, boolean resolveConflict) {
+        this.quatrixApi.upload(
+            Paths.get(filePath).toFile(),
+            UUID.fromString(parentId),
+            fileName, resolveConflict
+        );
     }
 
     /**
@@ -149,23 +161,19 @@ public class QuatrixConnector {
      * @param target destination directory
      * @param resolve if 'true' then possible name conflict will be resolved automatically
      *
-     * @return {@link JobResp}
+     * @return {@link Job}
      *
-     * @throws MuleException
+     * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
-    public JobResp copyFiles(List<String> ids, UUID target, @Optional @Default("true") Boolean resolve) throws MuleException {
-        CopyMoveFilesReq req = new CopyMoveFilesReq()
-                .ids(CollectionUtils.map(ids, new Function<String, UUID>() {
-                    @Override
-                    public UUID apply(String s) {
-                        return UUID.fromString(s);
-                    }
-                }))
-                .target(target)
-                .resolve(resolve);
-
-        return this.quatrixApi.copyFiles(req);
+    public Job copyFiles(List<String> ids, String target, @Optional @Default("true") Boolean resolve) {
+        final List<UUID> uuids = CollectionUtils.map(ids, new Function<String, UUID>() {
+            @Override
+            public UUID apply(String s) {
+                return UUID.fromString(s);
+            }
+        });
+        return this.quatrixApi.copyFiles(uuids, UUID.fromString(target), resolve);
     }
 
     /**
@@ -177,16 +185,11 @@ public class QuatrixConnector {
      * @param dirName name directory
      * @param resolve if 'true' then possible name conflict will be resolved automatically
      * @return {@link FileResp}
-     * @throws MuleException if Quatrix API is not available or network issues
+     * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
-    public FileResp createDir(UUID target, String dirName, @Optional @Default("true") Boolean resolve) throws MuleException {
-        MakeDirReq body = new MakeDirReq()
-                .target(target)
-                .name(dirName)
-                .resolve(resolve);
-
-        return this.quatrixApi.createDir(body);
+    public FileInfo createDir(String target, String dirName, @Default("true") Boolean resolve) {
+        return this.quatrixApi.createDir(UUID.fromString(target), dirName, resolve);
     }
 
     public void setUsername(String username) {
@@ -214,6 +217,7 @@ public class QuatrixConnector {
      * @param connectionStrategy Connection Strategy
      */
     public void setConnectionStrategy(QuatrixConnectorConnectionStrategy connectionStrategy) {
+        this.quatrixApi = connectionStrategy.getQuatrix();
         this.connectionStrategy = connectionStrategy;
     }
 }

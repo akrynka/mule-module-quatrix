@@ -1,28 +1,32 @@
 package org.quatrix.api;
 
-import io.swagger.client.model.*;
+import org.quatrix.model.*;
 
-import java.math.BigDecimal;
+import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
-//TODO: extend with other API methods
 public interface QuatrixApi {
 
-    SessionLoginResp login() throws QuatrixApiException;
+    Session login() throws QuatrixApiException;
 
     void logout() throws QuatrixApiException;
 
-    FileMetadataGetResp getHomeDirMeta(BigDecimal content) throws QuatrixApiException;
+    FileMetadata getHomeDirMeta(boolean includeContent) throws QuatrixApiException;
 
-    FileMetadataGetResp getFileMetadata(UUID uuid, BigDecimal content) throws QuatrixApiException;
+    FileMetadata getFileMetadata(UUID uuid, boolean includeContent) throws QuatrixApiException;
 
-    FileRenameResp renameFile(UUID uuid, FileRenameReq body) throws QuatrixApiException;
+    FileRenameResult renameFile(UUID uuid, String name, boolean resolveConfilct) throws QuatrixApiException;
 
-    IdsResp deleteFiles(IdsReq req) throws QuatrixApiException;
+    FileIds deleteFiles(List<UUID> ids) throws QuatrixApiException;
 
-    FileResp createDir(MakeDirReq req) throws QuatrixApiException;
+    FileInfo createDir(UUID targetDir, String name, boolean resolveConflict) throws QuatrixApiException;
 
-    JobResp copyFiles(CopyMoveFilesReq req) throws QuatrixApiException;
+    Job copyFiles(List<UUID> ids, UUID targetDir, boolean resolveConflict) throws QuatrixApiException;
+
+    File download(List<UUID> fileIds);
+
+    void upload(File file, UUID parentDir, String name, boolean resolveConflict);
 
     void close() throws QuatrixApiException;
 }

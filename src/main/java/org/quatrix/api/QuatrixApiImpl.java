@@ -5,9 +5,17 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.AuthApi;
 import io.swagger.client.api.FileApi;
-import io.swagger.client.model.*;
+import io.swagger.client.model.CopyMoveFilesReq;
+import io.swagger.client.model.FileRenameReq;
+import io.swagger.client.model.IdsReq;
+import io.swagger.client.model.MakeDirReq;
+import org.quatrix.api.config.ApiConfig;
+import org.quatrix.model.*;
+import org.quatrix.util.QuatrixThrowable;
 
+import java.io.File;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,39 +34,35 @@ public final class QuatrixApiImpl implements QuatrixApi {
     /**
      * General API client which makes all real calls to an API. <br />
      */
-    final ApiClient apiClient;
-    final AuthApi authApi;
-    final FileApi fileApi;
+    ApiClient apiClient;
+    AuthApi authApi;
+    FileApi fileApi;
+    FileTransferApi fileTransferApi;
 
     private UUID sessionId = null;
 
-    public QuatrixApiImpl(ApiClient apiClient) {
-        this.apiClient = apiClient;
-        this.authApi = new AuthApi(apiClient);
-        this.fileApi = new FileApi(apiClient);
-    }
-
-    public QuatrixApiImpl(AuthApi auth, FileApi fileApi, ApiClient apiClient) {
-        this.apiClient = apiClient;
-        this.authApi = auth;
-        this.fileApi = fileApi;
+    public QuatrixApiImpl(ApiConfig config) {
+        this.apiClient = createClient(config);
+        this.authApi = new AuthApi(this.apiClient);
+        this.fileApi = new FileApi(this.apiClient);
+        this.fileTransferApi = new FileTransferApiImpl(this.apiClient);
     }
 
     @Override
-    public SessionLoginResp login() throws QuatrixApiException {
+    public Session login() throws QuatrixApiException {
         if (sessionId == null) {
             try {
-                SessionLoginResp response = this.authApi.sessionLoginGet();
-                sessionId = response.getSessionId();
+                Session session = Session.from(this.authApi.sessionLoginGet());
+                sessionId = session.getId();
 
                 setupKeepAliveCallback(KEEP_ALIVE_DELAY, TimeUnit.MINUTES);
 
-                return response;
+                return session;
             } catch (ApiException e) {
-                throw asQuatrixException(e);
+                return QuatrixThrowable.throwNow(e);
             }
         } else {
-            return new SessionLoginResp().sessionId(sessionId);
+            return new Session(sessionId);
         }
     }
 
@@ -67,64 +71,92 @@ public final class QuatrixApiImpl implements QuatrixApi {
         try {
             this.authApi.sessionLogoutGet();
         } catch (ApiException e) {
-            throw asQuatrixException(e);
+            QuatrixThrowable.throwNow(e);
         } finally {
             cancelKeepAliveCallback();
         }
     }
 
     @Override
-    public FileMetadataGetResp getHomeDirMeta(BigDecimal content) throws QuatrixApiException {
+    public FileMetadata getHomeDirMeta(boolean includeContent) throws QuatrixApiException {
+        final BigDecimal content = includeContent ? BigDecimal.ONE : BigDecimal.ZERO;
         try {
-            return this.fileApi.fileMetadataGet(content);
+            return FileMetadata.from(this.fileApi.fileMetadataGet(content));
         } catch (ApiException e) {
-            throw asQuatrixException(e);
+            return QuatrixThrowable.throwNow(e);
         }
     }
 
     @Override
-    public FileMetadataGetResp getFileMetadata(UUID uuid, BigDecimal content) throws QuatrixApiException {
+    public FileMetadata getFileMetadata(UUID uuid, boolean includeContent) throws QuatrixApiException {
+        final BigDecimal content = includeContent ? BigDecimal.ONE : BigDecimal.ZERO;
         try {
-            return this.fileApi.fileMetadataIdGet(uuid, content);
+            return FileMetadata.from(this.fileApi.fileMetadataIdGet(uuid, content));
         } catch (ApiException e) {
-            throw asQuatrixException(e);
+            return QuatrixThrowable.throwNow(e);
         }
     }
 
     @Override
-    public FileRenameResp renameFile(UUID uuid, FileRenameReq body) throws QuatrixApiException {
+    public FileRenameResult renameFile(UUID uuid, String name, boolean resolveConflict) throws QuatrixApiException {
+        final FileRenameReq req = new FileRenameReq()
+                .name(name)
+                .resolve(resolveConflict);
+
         try {
-            return this.fileApi.fileRenameIdPost(uuid, body);
+            return FileRenameResult.from(this.fileApi.fileRenameIdPost(uuid, req));
         } catch (ApiException e) {
-            throw asQuatrixException(e);
+            return QuatrixThrowable.throwNow(e);
         }
     }
 
     @Override
-    public IdsResp deleteFiles(IdsReq req) throws QuatrixApiException {
+    public FileIds deleteFiles(List<UUID> ids) throws QuatrixApiException {
+        final IdsReq req = new IdsReq().ids(ids);
+
         try {
-            return this.fileApi.fileDeletePost(req);
+            return FileIds.from(this.fileApi.fileDeletePost(req));
         } catch (ApiException e) {
-            throw asQuatrixException(e);
+            return QuatrixThrowable.throwNow(e);
         }
     }
 
     @Override
-    public FileResp createDir(MakeDirReq req) throws QuatrixApiException {
+    public FileInfo createDir(UUID targetDir, String name, boolean resolveConflict) throws QuatrixApiException {
+        final MakeDirReq req = new MakeDirReq()
+                .target(targetDir)
+                .name(name)
+                .resolve(resolveConflict);
+
         try {
-            return this.fileApi.fileMakedirPost(req);
+            return FileInfo.from(this.fileApi.fileMakedirPost(req));
         } catch (ApiException e) {
-            throw asQuatrixException(e);
+            return QuatrixThrowable.throwNow(e);
         }
     }
 
     @Override
-    public JobResp copyFiles(CopyMoveFilesReq req) throws QuatrixApiException {
+    public Job copyFiles(List<UUID> ids, UUID targetDir, boolean resolveConflict) throws QuatrixApiException {
+        final CopyMoveFilesReq req = new CopyMoveFilesReq()
+                .target(targetDir)
+                .ids(ids)
+                .resolve(resolveConflict);
+
         try {
-            return this.fileApi.fileCopyPost(req);
+            return Job.from(this.fileApi.fileCopyPost(req));
         } catch (ApiException e) {
-            throw asQuatrixException(e);
+            return QuatrixThrowable.throwNow(e);
         }
+    }
+
+    @Override
+    public File download(List<UUID> fileIds) {
+        return fileTransferApi.downloadFile(fileIds);
+    }
+
+    @Override
+    public void upload(File file, UUID parentDir, String name, boolean resolveConflict) {
+        fileTransferApi.uploadFile(parentDir, file, name, resolveConflict);
     }
 
     @Override
@@ -132,10 +164,7 @@ public final class QuatrixApiImpl implements QuatrixApi {
         keepAliveCallExecutor.shutdownNow();
 
         try {
-            // logout required for proper session end
-            authApi.sessionLogoutGet();
-        } catch (ApiException e) {
-            throw asQuatrixException(e);
+            logout();
         } finally {
             final OkHttpClient httpClient = this.apiClient.getHttpClient();
             httpClient.getDispatcher().getExecutorService().shutdown();
@@ -143,11 +172,16 @@ public final class QuatrixApiImpl implements QuatrixApi {
         }
     }
 
-    private QuatrixApiException asQuatrixException(ApiException ex) {
-        return new QuatrixApiException(ex);
+    private ApiClient createClient(ApiConfig config) {
+        final ApiClient client = new ApiClient();
+        client.setBasePath(config.getBasePath());
+        client.setUsername(config.getUsername());
+        client.setPassword(config.getPassword());
+
+        return client;
     }
 
-    protected void setupKeepAliveCallback(long delay, TimeUnit timeUnit) {
+    private void setupKeepAliveCallback(long delay, TimeUnit timeUnit) {
        keepAliveCallFuture = keepAliveCallExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {

@@ -1,15 +1,41 @@
 package org.quatrix.api;
 
-import org.mule.api.MuleException;
-import org.mule.config.i18n.Message;
+import io.swagger.client.ApiException;
 
-public class QuatrixApiException extends MuleException {
+import java.util.List;
+import java.util.Map;
 
-    public QuatrixApiException(Message message) {
-        super(message);
+//@Getter
+public class QuatrixApiException extends RuntimeException {
+
+    private int code = 0;
+    private Map<String, List<String>> responseHeaders = null;
+    private String responseBody = null;
+
+    public QuatrixApiException(ApiException ex) {
+        super(ex);
+        this.code = ex.getCode();
+        this.responseHeaders = ex.getResponseHeaders();
+        this.responseBody = ex.getResponseBody();
     }
 
     public QuatrixApiException(Throwable cause) {
         super(cause);
+    }
+
+    public QuatrixApiException(String message) {
+        super(message);
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public Map<String, List<String>> getResponseHeaders() {
+        return responseHeaders;
+    }
+
+    public String getResponseBody() {
+        return responseBody;
     }
 }

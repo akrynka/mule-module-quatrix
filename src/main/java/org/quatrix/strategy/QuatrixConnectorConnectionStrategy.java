@@ -8,84 +8,111 @@
 package org.quatrix.strategy;
 
 import org.mule.api.ConnectionException;
+import org.mule.api.ConnectionExceptionCode;
 import org.mule.api.annotations.*;
 import org.mule.api.annotations.components.ConnectionManagement;
+import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
+import org.quatrix.api.QuatrixApi;
+import org.quatrix.api.QuatrixApiException;
+import org.quatrix.api.QuatrixApiImpl;
+import org.quatrix.api.config.ApiConfig;
+import org.quatrix.api.config.ApiConfigBuilder;
+import org.quatrix.model.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Connection Management Strategy
+ * Basic auth connection management for Quatrix API.
  *
- * @author MuleSoft, Inc.
+ * @author Aleksey K
  */
-@ConnectionManagement(configElementName = "config-type", friendlyName = "Basic Auth type strategy")
+@ConnectionManagement(configElementName = "basic-auth-config", friendlyName = "Basic Auth connection config")
 public class QuatrixConnectorConnectionStrategy {
-    private final Logger logger = LoggerFactory.getLogger(QuatrixConnectorConnectionStrategy.class);
 
-    /**
-     * Configurable
-     */
+    private static final Logger logger = LoggerFactory.getLogger(QuatrixConnectorConnectionStrategy.class);
+
+
+    private QuatrixApi quatrixApi;
+    private String sessionId;
+
     @Configurable
-    @Default("value")
-    private String myStrategyProperty;
+    @Default("https://api.quatrix.it/api/1.0")
+    @FriendlyName("Quatrix API url")
+    private String basePath;
+
+    @Configurable
+    @Default("5")
+    @FriendlyName("Delay in minutes for sending keep alive requests")
+    private long keepAliveCallDelay;
 
     /**
-     * Connect
+     * Connect to Quatrix API.
      *
      * @param username A username
      * @param password A password
-     * @throws ConnectionException
+     * @throws ConnectionException if unable to login
      */
     @Connect
     @TestConnectivity
-    public void connect(@ConnectionKey String username, @Password String password)
-            throws ConnectionException {
-        logger.info("Connected!!!");
+    public void connect(@ConnectionKey String username, @Password String password) throws ConnectionException {
+        final ApiConfig config = new ApiConfigBuilder()
+                .setBasePath(basePath)
+                .setKeepAliveCallDelay(keepAliveCallDelay)
+                .setUsername(username)
+                .setPassword(password)
+                .build();
+
+        this.quatrixApi = new QuatrixApiImpl(config);
+        try {
+            Session session = quatrixApi.login();
+            this.sessionId = session.getId().toString();
+        } catch (QuatrixApiException e) {
+            throw new ConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, "", e.getMessage());
+        }
     }
 
-    /**
-     * Disconnect
-     */
     @Disconnect
     public void disconnect() {
-        /*
-         * CODE FOR CLOSING A CONNECTION GOES IN HERE
-         */
+        try {
+            quatrixApi.close();
+        } catch (QuatrixApiException e) {
+            logger.error("Error during disconnect", e);
+        } finally {
+            this.quatrixApi = null;
+            this.sessionId = null;
+        }
     }
 
-    /**
-     * Are we connected
-     */
     @ValidateConnection
     public boolean isConnected() {
-        //TODO: Change it to reflect that we are connected.
-        return false;
+        return sessionId != null;
     }
 
-    /**
-     * Are we connected
-     */
     @ConnectionIdentifier
     public String connectionId() {
-        return "001";
+        return sessionId;
     }
 
-    /**
-     * Get property
-     */
-    public String getMyStrategyProperty() {
-        return this.myStrategyProperty;
+    public String getBasePath() {
+        return basePath;
     }
 
-    /**
-     * Set strategy property
-     *
-     * @param myStrategyProperty my strategy property
-     */
-    public void setMyStrategyProperty(String myStrategyProperty) {
-        this.myStrategyProperty = myStrategyProperty;
+    public void setBasePath(String basePath) {
+        this.basePath = basePath;
+    }
+
+    public long getKeepAliveCallDelay() {
+        return keepAliveCallDelay;
+    }
+
+    public void setKeepAliveCallDelay(long keepAliveCallDelay) {
+        this.keepAliveCallDelay = keepAliveCallDelay;
+    }
+
+    public QuatrixApi getQuatrix() {
+        return quatrixApi;
     }
 }
