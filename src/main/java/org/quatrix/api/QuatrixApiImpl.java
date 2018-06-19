@@ -54,6 +54,7 @@ public final class QuatrixApiImpl implements QuatrixApi {
             try {
                 Session session = Session.from(this.authApi.sessionLoginGet());
                 sessionId = session.getId();
+                this.apiClient.setApiKey(sessionId.toString());
 
                 setupKeepAliveCallback(KEEP_ALIVE_DELAY, TimeUnit.MINUTES);
 
@@ -73,6 +74,7 @@ public final class QuatrixApiImpl implements QuatrixApi {
         } catch (ApiException e) {
             QuatrixThrowable.throwNow(e);
         } finally {
+            this.apiClient.setApiKey(null);
             cancelKeepAliveCallback();
         }
     }
