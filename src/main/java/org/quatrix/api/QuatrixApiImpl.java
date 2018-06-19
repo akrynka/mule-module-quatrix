@@ -174,7 +174,9 @@ public final class QuatrixApiImpl implements QuatrixApi {
 
     private ApiClient createClient(ApiConfig config) {
         final ApiClient client = new ApiClient();
-        client.setBasePath(config.getBasePath());
+        if (config.getBasePath() != null) {
+            client.setBasePath(config.getBasePath());
+        }
         client.setUsername(config.getUsername());
         client.setPassword(config.getPassword());
 
