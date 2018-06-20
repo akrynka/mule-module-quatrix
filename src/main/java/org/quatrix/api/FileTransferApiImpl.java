@@ -1,37 +1,70 @@
 package org.quatrix.api;
 
-import com.squareup.okhttp.*;
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.Pair;
 import io.swagger.client.api.FileApi;
 import io.swagger.client.api.UploadApi;
 import io.swagger.client.model.IdsReq;
+import io.swagger.client.model.UploadFinalizeResp;
 import io.swagger.client.model.UploadLinkReq;
+import org.quatrix.model.UploadResult;
+import org.quatrix.util.QuatrixThrowable;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.*;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-public final class FileTransferApiImpl implements FileTransferApi {
+final class FileTransferApiImpl implements FileTransferApi {
+
+    private static final String X_AUTH_TOKEN_HEADER = "X-Auth-Token";
+    // upload buffer size 4KB
+    private static final int MAX_UPLOAD_BUFFER_LEN = 4194304;
 
     private final ApiClient client;
     private final UploadApi uploadApi;
     private final FileApi fileApi;
 
-    public FileTransferApiImpl(ApiClient client) {
+    FileTransferApiImpl(ApiClient client) {
         this.client = client;
         this.uploadApi = new UploadApi(client);
         this.fileApi = new FileApi(client);
     }
 
+    /**
+     * Upload run in 3 steps: get upload link, upload file, finalize upload.
+     * @param dirId Directory id where to upload file
+     * @param file File for upload
+     * @param name File name on remote filesystem
+     * @param resolveConflict if true server should automatically resolve possible name conflict
+     * @return {@link UploadResult}
+     */
     @Override
-    public void uploadFile(UUID dirId, File file, String name, boolean resolveConflict) throws QuatrixApiException {
+    public UploadResult uploadFile(UUID dirId, File file, String name, boolean resolveConflict) {
         final UUID uploadKey = retrieveUploadKey(dirId, file, name, resolveConflict);
 
-        uploadFile(file, uploadKey);
-        finalizeUpload(uploadKey);
+        try {
+            uploadFile(file, uploadKey);
+        } catch (Exception e) {
+            QuatrixThrowable.throwNow(e);
+        }
+
+        return UploadResult.from(finalizeUpload(uploadKey));
     }
 
     @Override
@@ -39,39 +72,65 @@ public final class FileTransferApiImpl implements FileTransferApi {
         return download(retrieveDownloadLink(fileIds));
     }
 
-    private void finalizeUpload(UUID uploadKey) {
+    private UploadFinalizeResp finalizeUpload(UUID uploadKey) {
         try {
-            uploadApi.uploadFinalizeIdGet(uploadKey, null);
+            return uploadApi.uploadFinalizeIdGet(uploadKey, null);
         } catch (ApiException e) {
             throw new QuatrixApiException(e);
         }
     }
 
-    private void uploadFile(File file, UUID uploadKey) throws QuatrixApiException {
-        final String url = String.format("%s/upload/chunked/%s", client.getBasePath(), uploadKey);
+    private void uploadFile(File file, UUID uploadKey) throws Exception {
+        final String url = String.format("%s/upload/chunked/%s",
+                client.getBasePath().replace("/api/1.0", ""), uploadKey
+        );
+        final long contentLength = file.length();
+        final MediaType mediaType = Optional.fromNullable(Files.probeContentType(file.toPath()))
+                .transform(new Function<String, MediaType>() {
+                    @Override
+                    public MediaType apply(String s) {
+                        return MediaType.parse(s);
+                    }
+                }).orNull();
 
-        try {
-            Response response = client.getHttpClient().newCall(
-                    new Request.Builder()
-                            .url(url)
-                            .header("Authorization", getBasicAuthHeaderValue())
-                            .header("Transfer-Encoding", "chunked")
-                            .header("Content-Range", "") //TODO: check if required
-                            .post(RequestBody.create(MediaType.parse(file.getName()), file))
-                            .build()
+        long readBytes = 0L;
+        long totalReadBytes = 0L;
 
-            ).execute();
+        try (InputStream fileStream = new FileInputStream(file)) {
+            while (readBytes >= 0) {
+                int buffSize = Math.min(MAX_UPLOAD_BUFFER_LEN, (int) (contentLength - totalReadBytes));
+                byte[] buffer = new byte[Math.max(buffSize, 1)];
+                readBytes = fileStream.read(buffer);
+                if (readBytes > 0) {
+                    final String contentRange
+                            = String.format("bytes %d-%d/%d", totalReadBytes, (totalReadBytes + readBytes) - 1, contentLength);
 
-            if (!response.isSuccessful()) {
-                throw new ApiException("Unable to upload file", response.code(), response.headers().toMultimap(), response.body().string());
+                    try {
+                        Response response = client.getHttpClient().newCall(
+                                new Request.Builder()
+                                        .url(url)
+                                        .header(X_AUTH_TOKEN_HEADER, getAuthToken())
+                                        .header("Content-Range", contentRange)
+                                        .post(RequestBody.create(mediaType, buffer))
+                                        .build()
+
+                        ).execute();
+
+                        if (!response.isSuccessful()) {
+                            throw new ApiException("Unable to upload file", response.code(), response.headers().toMultimap(), response.body().string());
+                        }
+
+                    } catch (IOException | ApiException e) {
+                        throw new QuatrixApiException(e);
+                    }
+
+                    totalReadBytes += readBytes;
+                }
             }
-
-        } catch (IOException | ApiException e) {
-            throw new QuatrixApiException(e);
         }
     }
 
-    private UUID retrieveUploadKey(UUID dirId, File file, String name, boolean resolveConflict) throws QuatrixApiException {
+    private UUID retrieveUploadKey(UUID dirId, File file, String name, boolean resolveConflict) {
         final UploadLinkReq req = new UploadLinkReq()
                 .parentId(dirId)
                 .name(name)
@@ -101,7 +160,7 @@ public final class FileTransferApiImpl implements FileTransferApi {
             Response response = httpClient.newCall(
                     new Request.Builder()
                             .url(url)
-                            .header("Authorization", getBasicAuthHeaderValue())
+                            .header(X_AUTH_TOKEN_HEADER, getAuthToken())
                             .header("Accept", "application/octet-stream")
                             .get()
                             .build()
@@ -116,10 +175,10 @@ public final class FileTransferApiImpl implements FileTransferApi {
         }
     }
 
-    private String getBasicAuthHeaderValue() {
+    private String getAuthToken() {
         Map<String, String> headers = new HashMap<>();
-        client.getAuthentication("basicAuth").applyToParams(new ArrayList<Pair>(), headers);
+        client.getAuthentication("api_key").applyToParams(new ArrayList<Pair>(), headers);
 
-        return headers.get("Authorization");
+        return headers.get(X_AUTH_TOKEN_HEADER);
     }
 }

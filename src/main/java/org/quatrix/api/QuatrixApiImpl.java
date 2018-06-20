@@ -157,8 +157,8 @@ public final class QuatrixApiImpl implements QuatrixApi {
     }
 
     @Override
-    public void upload(File file, UUID parentDir, String name, boolean resolveConflict) {
-        fileTransferApi.uploadFile(parentDir, file, name, resolveConflict);
+    public UploadResult upload(File file, UUID parentDir, String name, boolean resolveConflict) {
+        return fileTransferApi.uploadFile(parentDir, file, name, resolveConflict);
     }
 
     @Override

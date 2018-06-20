@@ -26,7 +26,7 @@ public interface QuatrixApi {
 
     File download(List<UUID> fileIds);
 
-    void upload(File file, UUID parentDir, String name, boolean resolveConflict);
+    UploadResult upload(File file, UUID parentDir, String name, boolean resolveConflict);
 
     void close() throws QuatrixApiException;
 }
