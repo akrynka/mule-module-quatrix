@@ -32,7 +32,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     <flow name="delete-files">
         <quatrix:delete-files config-ref="Quatrix">
             <quatrix:ids>
-                <quatrix:id>#[flowVars.ids.get(0)]</quatrix:id>
+                <quatrix:id>#[flowVars.ids]</quatrix:id>
             </quatrix:ids>
         </quatrix:delete-files>
     </flow>

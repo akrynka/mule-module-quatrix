@@ -13,6 +13,9 @@ import org.quatrix.model.UploadResult;
 import org.springframework.util.Assert;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -31,7 +34,10 @@ public class FileDownloadTestCase extends QuatrixParentTestCase {
         initializeTestRunMessage("homeMetaTestData");
 
         upsertOnTestRunMessage("parentId", ((FileMetadata) runFlowAndGetPayload("get-home-dir-meta")).getContent().get(4).getId().toString());
-        upsertOnTestRunMessage("filePath", "/Users/apple_039/Documents/Foxtrot/quatrix-connector/src/main/resources/quatrix-swagger-api.json");
+
+        Path path = Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource("testUpload.txt")).toURI());
+        upsertOnTestRunMessage("filePath", path.toString());
+
         upsertOnTestRunMessage("fileName", "someFile.json");
         upsertOnTestRunMessage("resolveConflict", "true");
 
