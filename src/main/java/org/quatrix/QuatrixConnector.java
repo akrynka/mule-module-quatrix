@@ -11,16 +11,21 @@
 package org.quatrix;
 
 import com.google.common.base.Function;
-import io.swagger.client.model.*;
-import org.mule.api.MuleException;
-import org.mule.api.annotations.Config;
+import io.swagger.client.model.FileRenameResp;
+import io.swagger.client.model.FileResp;
+import io.swagger.client.model.IdsResp;
+import org.mule.api.annotations.ConnectionStrategy;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.quatrix.api.QuatrixApi;
-import org.quatrix.model.*;
+import org.quatrix.model.FileIds;
+import org.quatrix.model.FileInfo;
+import org.quatrix.model.FileMetadata;
+import org.quatrix.model.FileRenameResult;
+import org.quatrix.model.Job;
 import org.quatrix.strategy.QuatrixConnectorConnectionStrategy;
 import org.quatrix.util.CollectionUtils;
 
@@ -36,7 +41,7 @@ import java.util.UUID;
  *
  * @author MuleSoft, Inc.
  */
-@Connector(name = "quatrix", schemaVersion = "1.0-SNAPSHOT", friendlyName = "quatrix")
+@Connector(name = "quatrix", schemaVersion = "1.0-SNAPSHOT", friendlyName = "Quatrix", minMuleVersion = "3.9.0")
 public class QuatrixConnector {
 
     //TODO: move to config class
@@ -54,7 +59,7 @@ public class QuatrixConnector {
     /**
      * Connection Strategy
      */
-    @Config
+    @ConnectionStrategy
     QuatrixConnectorConnectionStrategy connectionStrategy;
 
     @Stop
@@ -68,11 +73,11 @@ public class QuatrixConnector {
      *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:home-metadata}
      *
      * @param content if '1' then directory content will be included in response
-     * @return {@link FileMetadataGetResp}
-     * @throws MuleException if Quatrix API is not available or network issues
+     * @return {@link FileMetadata}
+     * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
-    public FileMetadata getHomeMetadata(@Optional @Default("true") Boolean content) throws MuleException {
+    public FileMetadata homeMetadata(@Default("true") Boolean content) {
         return this.quatrixApi.getHomeDirMeta(content);
     }
 
@@ -84,11 +89,11 @@ public class QuatrixConnector {
      * @param uuid
      * @param newFileName
      * @param resolve if 'true' then possible name conflict will be resolved automatically
-     * @return {@link FileRenameResp}
+     * @return {@link FileRenameResult}
      * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
-    public FileRenameResult renameFile(UUID uuid, String newFileName, @Optional @Default("true") Boolean resolve) {
+    public FileRenameResult renameFile(UUID uuid, String newFileName, @Default("true") Boolean resolve) {
         return this.quatrixApi.renameFile(uuid, newFileName, resolve);
     }
 
@@ -98,7 +103,7 @@ public class QuatrixConnector {
      *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:delete-files}
      *
      * @param ids
-     * @return {@link IdsResp}
+     * @return {@link FileIds}
      * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
@@ -166,7 +171,7 @@ public class QuatrixConnector {
      * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
-    public Job copyFiles(List<String> ids, String target, @Optional @Default("true") Boolean resolve) {
+    public Job copyFiles(List<String> ids, String target, @Default("true") Boolean resolve) {
         final List<UUID> uuids = CollectionUtils.map(ids, new Function<String, UUID>() {
             @Override
             public UUID apply(String s) {

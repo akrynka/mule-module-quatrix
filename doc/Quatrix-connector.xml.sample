@@ -1,3 +1,3 @@
-<!-- BEGIN_INCLUDE(quatrix:home-metadata) -->
-    <quatrix:home-metadata content="#[map-payload:content]" />
-<!-- END_INCLUDE(quatrix:home-metadata) -->
+<!-- BEGIN_INCLUDE(quatrix:homeMetadata) -->
+    <quatrix:home-metadata config-ref="Quatrix" content="#[map-payload:content]" />
+<!-- END_INCLUDE(quatrix:homeMetadata) -->

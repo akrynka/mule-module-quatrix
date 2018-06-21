@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Aleksey K
  */
-@ConnectionManagement(configElementName = "basic-auth-config", friendlyName = "Basic Auth connection config")
+@ConnectionManagement(configElementName = "config-type", friendlyName = "Basic Auth connection config")
 public class QuatrixConnectorConnectionStrategy {
 
     private static final Logger logger = LoggerFactory.getLogger(QuatrixConnectorConnectionStrategy.class);
@@ -70,7 +70,7 @@ public class QuatrixConnectorConnectionStrategy {
             Session session = quatrixApi.login();
             this.sessionId = session.getId().toString();
         } catch (QuatrixApiException e) {
-            throw new ConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, "", e.getMessage());
+            throw new ConnectionException(ConnectionExceptionCode.UNKNOWN, "", e.getMessage());
         }
     }
 

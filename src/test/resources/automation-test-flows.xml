@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:quatrix="http://www.mulesoft.org/schema/mule/quatrix"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+        http://www.mulesoft.org/schema/mule/quatrix  http://www.mulesoft.org/schema/mule/quatrix/1.0-SNAPSHOT/mule-quatrix.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.9/mule.xsd">
+
+    <context:property-placeholder location="automation-credentials.properties"/>
+
+    <!-- TODO(aleksey): use placeholders instead hardcode values -->
+    <quatrix:config-type name="Quatrix"
+                    basePath="https://rabulus.quatrix.it/api/1.0"
+
+                    username="alexeykrynka@gmail.com"
+                    password="Quatrix_Connector"
+                    doc:name="Quatrix"
+            />
+
+    <flow name="get-home-dir-meta">
+        <quatrix:home-metadata config-ref="Quatrix" content="#[flowVars.content]"/>
+    </flow>
+
+</mule>

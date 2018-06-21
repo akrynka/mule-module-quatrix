@@ -9,10 +9,10 @@
         http://www.mulesoft.org/schema/mule/quatrix http://www.mulesoft.org/schema/mule/quatrix/1.0-SNAPSHOT/mule-quatrix.xsd">
 
 
-    <quatrix:config-type name="config" username="foo" password="foo"/>
+    <quatrix:config-type name="Quatrix" username="" password="" />
 
     <flow name="testFlow">
-        <quatrix:get-home-metadata content="1" config-ref="config"/>
+        <quatrix:home-metadata config-ref="Quatrix" content="1" />
     </flow>
 
 </mule>

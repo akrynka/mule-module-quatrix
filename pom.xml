@@ -29,6 +29,7 @@
         <mock.server.version>5.3.0</mock.server.version>
         <org.json.version>20160810</org.json.version>
         <resteasy.version>3.5.1.Final</resteasy.version>
+        <connector.test.version>2.0.7</connector.test.version>
     </properties>
 
     <scm>
@@ -116,6 +117,19 @@
             <version>${resteasy.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-connector-test</artifactId>
+            <version>${connector.test.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!--<dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-scripting</artifactId>
+            <version>${mule.version}</version>
+            <scope>test</scope>
+        </dependency>-->
     </dependencies>
 
     <build>
