@@ -41,7 +41,7 @@ public class QuatrixRealApiTest {
         List<UUID> ids = new ArrayList<>();
 
         testUploadFile();
-        ids.add(api.getFileMetadata(UUID.fromString("26317fc8-19bd-40db-9177-50ad8c65c9d3"), true).getContent().get(0).getId());
+        ids.add(api.getFileMetadata(UUID.fromString("cbc54965-71f4-490b-b5a5-e5b976ebc67a"), true).getContent().get(0).getId());
         FileIds response = api.deleteFiles(ids);
 
         Assert.assertEquals(ids, response.getIds());
@@ -52,7 +52,7 @@ public class QuatrixRealApiTest {
         String fileName = "rename.patch";
         boolean resolve = true;
 
-        FileRenameResult response = api.renameFile(api.getFileMetadata(UUID.fromString("26317fc8-19bd-40db-9177-50ad8c65c9d3"), true).getContent().get(0).getId(), fileName, resolve);
+        FileRenameResult response = api.renameFile(api.getFileMetadata(UUID.fromString("cbc54965-71f4-490b-b5a5-e5b976ebc67a"), true).getContent().get(0).getId(), fileName, resolve);
 
         Assert.assertEquals(fileName, response.getName());
     }
@@ -60,20 +60,20 @@ public class QuatrixRealApiTest {
     @Test
     public void testDownloadFile() throws QuatrixApiException {
         List<UUID> ids = new ArrayList<>();
-        ids.add(api.getFileMetadata(UUID.fromString("26317fc8-19bd-40db-9177-50ad8c65c9d3"), true).getContent().get(0).getId());
+        ids.add(api.getFileMetadata(UUID.fromString("cbc54965-71f4-490b-b5a5-e5b976ebc67a"), true).getContent().get(0).getId());
 
         File file = api.download(ids);
 
-        Assert.assertEquals(api.getFileMetadata(UUID.fromString("26317fc8-19bd-40db-9177-50ad8c65c9d3"), true).getName(), file.getName());
+        Assert.assertEquals(api.getFileMetadata(UUID.fromString("cbc54965-71f4-490b-b5a5-e5b976ebc67a"), true).getName(), file.getName());
     }
 
     @Test
     public void testUploadFile() throws QuatrixApiException {
         File file = new File("/Users/apple_039/Documents/Foxtrot/quatrix-connector/src/test/java/HttpTest.java");
 
-        api.upload(file, UUID.fromString("26317fc8-19bd-40db-9177-50ad8c65c9d3"), "aaaaaaa.java", true);
-
-        Assert.assertEquals(file.getName(),  api.getFileMetadata(UUID.fromString("26317fc8-19bd-40db-9177-50ad8c65c9d3"), true).getName());
+        api.upload(file, UUID.fromString("cbc54965-71f4-490b-b5a5-e5b976ebc67a"), "aaaaaaa.java", true);
+        System.out.println(api.getFileMetadata(UUID.fromString("cbc54965-71f4-490b-b5a5-e5b976ebc67a"), true).getContent().get(0).getId());
+        Assert.assertEquals("aaaaaaa.java",  api.getFileMetadata(UUID.fromString("cbc54965-71f4-490b-b5a5-e5b976ebc67a"), true).getContent().get(0).getName());
     }
 
     @Test(expected = QuatrixApiException.class)

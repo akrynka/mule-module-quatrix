@@ -25,4 +25,16 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <quatrix:home-metadata config-ref="Quatrix" content="#[flowVars.content]"/>
     </flow>
 
+    <flow name="rename-file">
+        <quatrix:rename-file config-ref="Quatrix" uuid-ref="#[flowVars.uuid]" newFileName="#[flowVars.newFileName]" resolve="#[flowVars.resolve]"/>
+    </flow>
+
+    <flow name="delete-files">
+        <quatrix:delete-files config-ref="Quatrix">
+            <quatrix:ids>
+                <quatrix:id>#[flowVars.ids]</quatrix:id>
+            </quatrix:ids>
+        </quatrix:delete-files>
+    </flow>
+
 </mule>

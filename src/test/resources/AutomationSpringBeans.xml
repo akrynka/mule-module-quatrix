@@ -15,4 +15,20 @@
         <entry key="content" value="1"/>
     </util:map>
 
+    <util:map id="renameFileTestData" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object"
+              scope="prototype">
+        <entry key="uuid" value=""/>
+        <entry key="newFileName" value="bbbbbbb"/>
+        <entry key="resolve" value="true"/>
+    </util:map>
+
+    <util:map id="deleteFilesTestData" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object"
+              scope="prototype">
+        <entry key="ids" value="fileIds"/>
+    </util:map>
+
+    <util:list id="fileIds" value-type="java.lang.String">
+        <value>d0335328-7063-457d-b8c8-c0ae40225a99</value>
+    </util:list>
+
 </beans>
