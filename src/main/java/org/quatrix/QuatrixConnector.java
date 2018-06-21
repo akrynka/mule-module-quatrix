@@ -11,27 +11,22 @@
 package org.quatrix;
 
 import com.google.common.base.Function;
-import io.swagger.client.model.FileRenameResp;
-import io.swagger.client.model.FileResp;
-import io.swagger.client.model.IdsResp;
 import org.mule.api.annotations.ConnectionStrategy;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.annotations.param.Default;
-import org.mule.api.annotations.param.Optional;
 import org.quatrix.api.QuatrixApi;
 import org.quatrix.model.FileIds;
 import org.quatrix.model.FileInfo;
 import org.quatrix.model.FileMetadata;
 import org.quatrix.model.FileRenameResult;
 import org.quatrix.model.Job;
+import org.quatrix.model.UploadResult;
 import org.quatrix.strategy.QuatrixConnectorConnectionStrategy;
 import org.quatrix.util.CollectionUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
@@ -43,16 +38,6 @@ import java.util.UUID;
  */
 @Connector(name = "quatrix", schemaVersion = "1.0-SNAPSHOT", friendlyName = "Quatrix", minMuleVersion = "3.9.0")
 public class QuatrixConnector {
-
-    //TODO: move to config class
-    //A @Configurable field can not repeat the name of any parameter that belongs to the @Connect method
-//    @Configurable
-    private String username = "alexeykrynka@gmail.com";
-
-    //TODO: move to config class
-    //A @Configurable field can not repeat the name of any parameter that belongs to the @Connect method
-//    @Configurable
-    private String password = "Quatrix_Connector";
 
     private QuatrixApi quatrixApi;
 
@@ -122,19 +107,17 @@ public class QuatrixConnector {
      *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:download-file}
      *
      * @param fileIds File ids for download
-     * @param path Destination path on local filesystem
      * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
+     * @return {@link File}
      */
     @Processor
-    public void downloadFile(List<String> fileIds, String path) throws IOException {
-        File file = this.quatrixApi.download(CollectionUtils.map(fileIds, new Function<String, UUID>() {
+    public File downloadFile(List<String> fileIds) {
+        return this.quatrixApi.download(CollectionUtils.map(fileIds, new Function<String, UUID>() {
             @Override
             public UUID apply(String s) {
                 return UUID.fromString(s);
             }
         }));
-
-        Files.move(file.toPath(), Paths.get(path));
     }
 
     /**
@@ -149,8 +132,8 @@ public class QuatrixConnector {
      * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
-    public void uploadFile(String filePath, String parentId, String fileName, boolean resolveConflict) {
-        this.quatrixApi.upload(
+    public UploadResult uploadFile(String filePath, String parentId, String fileName, boolean resolveConflict) {
+        return this.quatrixApi.upload(
             Paths.get(filePath).toFile(),
             UUID.fromString(parentId),
             fileName, resolveConflict
@@ -189,24 +172,12 @@ public class QuatrixConnector {
      * @param target destination directory
      * @param dirName name directory
      * @param resolve if 'true' then possible name conflict will be resolved automatically
-     * @return {@link FileResp}
+     * @return {@link FileInfo}
      * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
     public FileInfo createDir(String target, String dirName, @Default("true") Boolean resolve) {
         return this.quatrixApi.createDir(UUID.fromString(target), dirName, resolve);
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     /**
