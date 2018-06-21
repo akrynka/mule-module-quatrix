@@ -23,6 +23,7 @@ import org.quatrix.model.FileMetadata;
 import org.quatrix.model.FileRenameResult;
 import org.quatrix.model.Job;
 import org.quatrix.model.UploadResult;
+import org.quatrix.model.*;
 import org.quatrix.strategy.QuatrixConnectorConnectionStrategy;
 import org.quatrix.util.CollectionUtils;
 

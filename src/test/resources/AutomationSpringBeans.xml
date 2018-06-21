@@ -23,6 +23,22 @@
         <entry key="dirName" value-ref="randomShortString"/>
         <entry key="target" value=""/>
         <entry key="resolve" value="true"/>
+        <entry key="content" value="true"/>
+    </util:map>
+
+    <util:map id="copyFilesTestData" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object"
+              scope="prototype">
+        <entry key="ids" value="" />
+        <entry key="target" value="" />
+        <entry key="resolve" value="true" />
+    </util:map>
+
+    <util:map id="uploadFileTestData" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object"
+              scope="prototype">
+        <entry key="filePath" value="" />
+        <entry key="parentId" value="" />
+        <entry key="fileName" value="" />
+        <entry key="resolveConflict" value="true" />
     </util:map>
 
     <util:map id="renameFileTestData" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object"
