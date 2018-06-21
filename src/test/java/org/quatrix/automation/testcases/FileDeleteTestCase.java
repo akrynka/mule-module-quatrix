@@ -7,7 +7,9 @@ import org.mule.modules.tests.ConnectorTestUtils;
 import org.quatrix.automation.QuatrixParentTestCase;
 import org.quatrix.automation.SmokeTests;
 import org.quatrix.model.FileIds;
+import org.quatrix.model.FileMetadata;
 import org.quatrix.model.FileRenameResult;
+import org.quatrix.model.UploadResult;
 
 import java.util.UUID;
 
@@ -16,16 +18,23 @@ import static org.junit.Assert.fail;
 
 public class FileDeleteTestCase extends QuatrixParentTestCase {
 
-    //TODO(ringil): replace with upload flow
     @Before
     public void setUp() throws Exception {
         initializeTestRunMessage("deleteFilesTestData");
-        upsertOnTestRunMessage("ids", UUID.fromString("4c1405b9-9c82-4b85-9a9c-993029e6706c"));
+        initializeTestRunMessage("uploadFileTestData");
+        initializeTestRunMessage("homeMetaTestData");
+
+        upsertOnTestRunMessage("parentId", ((FileMetadata) runFlowAndGetPayload("get-home-dir-meta")).getContent().get(4).getId().toString());
+        upsertOnTestRunMessage("filePath", "/Users/apple_039/Documents/Foxtrot/quatrix-connector/src/main/resources/quatrix-swagger-api.json");
+        upsertOnTestRunMessage("fileName", "someFile.json");
+        upsertOnTestRunMessage("resolveConflict", "true");
+
+        upsertOnTestRunMessage("ids", ((UploadResult) runFlowAndGetPayload("upload-file")).getId());
     }
 
     @Category(SmokeTests.class)
     @Test
-    public void testRenameFile() {
+    public void testDeleteFile() {
         try {
             FileIds fileIds = runFlowAndGetPayload("delete-files");
             assertNotNull(fileIds);
