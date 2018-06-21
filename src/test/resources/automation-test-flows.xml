@@ -37,6 +37,11 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         </quatrix:delete-files>
     </flow>
 
+
+    <flow name="create-dir">
+        <quatrix:create-dir config-ref="Quatrix" target="#[flowVars.target]" dirName="#[flowVars.dirName]" resolve="true"/>
+    </flow>
+
     <flow name="copy-files">
         <quatrix:copy-files config-ref="Quatrix" target="#[flowVars.target]" resolve="#[flowVars.resolve]">
             <quatrix:ids>

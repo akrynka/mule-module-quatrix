@@ -15,6 +15,17 @@
         <entry key="content" value="true"/>
     </util:map>
 
+    <bean id="randomShortString" class="org.mule.modules.tests.ConnectorTestUtils"
+          factory-method="generateRandomShortString" scope="prototype"/>
+
+    <util:map id="createDirTestData" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object"
+              scope="prototype">
+        <entry key="dirName" value-ref="randomShortString"/>
+        <entry key="target" value=""/>
+        <entry key="resolve" value="true"/>
+        <entry key="content" value="true"/>
+    </util:map>
+
     <util:map id="copyFilesTestData" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object"
               scope="prototype">
         <entry key="ids" value="" />
