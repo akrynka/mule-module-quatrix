@@ -28,7 +28,6 @@ public class FileRenameTestCase extends QuatrixParentTestCase {
         initializeTestRunMessage("homeMetaTestData");
 
         upsertOnTestRunMessage("parentId", ((FileMetadata) runFlowAndGetPayload("get-home-dir-meta")).getContent().get(4).getId().toString());
-
         upsertOnTestRunMessage("filePath", "/Users/apple_039/Documents/Foxtrot/quatrix-connector/src/main/resources/quatrix-swagger-api.json");
         upsertOnTestRunMessage("fileName", "someFile.json");
         upsertOnTestRunMessage("resolveConflict", "true");

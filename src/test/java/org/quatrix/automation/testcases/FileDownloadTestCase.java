@@ -7,19 +7,26 @@ import org.junit.experimental.categories.Category;
 import org.mule.modules.tests.ConnectorTestUtils;
 import org.quatrix.automation.QuatrixParentTestCase;
 import org.quatrix.automation.SmokeTests;
+import org.quatrix.model.FileIds;
 import org.quatrix.model.FileMetadata;
 import org.quatrix.model.UploadResult;
 import org.springframework.util.Assert;
 
+import java.io.File;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-public class UploadResultTestCase extends QuatrixParentTestCase {
+public class FileDownloadTestCase extends QuatrixParentTestCase {
+
+    private UUID fileUuid;
 
     @Before
     public void setUp() throws Exception {
 
+        initializeTestRunMessage("downloadFileTestData");
         initializeTestRunMessage("uploadFileTestData");
         initializeTestRunMessage("homeMetaTestData");
 
@@ -27,16 +34,26 @@ public class UploadResultTestCase extends QuatrixParentTestCase {
         upsertOnTestRunMessage("filePath", "/Users/apple_039/Documents/Foxtrot/quatrix-connector/src/main/resources/quatrix-swagger-api.json");
         upsertOnTestRunMessage("fileName", "someFile.json");
         upsertOnTestRunMessage("resolveConflict", "true");
+
+        fileUuid = ((UploadResult) runFlowAndGetPayload("upload-file")).getId();
+        upsertOnTestRunMessage("fileIds", ((UploadResult) runFlowAndGetPayload("upload-file")).getId());
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        upsertOnTestRunMessage("ids", fileUuid);
+        runFlowAndGetPayload("delete-files");
     }
 
     @Category(SmokeTests.class)
     @Test
-    public void testUploadFile() {
+    public void testDownloadFile() {
         try {
-            UploadResult uploadResult = runFlowAndGetPayload("upload-file");
-            Assert.notNull(uploadResult.getId());
+            File file = runFlowAndGetPayload("download-file");
+            assertNotNull(file);
         } catch (Exception e) {
             fail(ConnectorTestUtils.getStackTrace(e));
         }
     }
 }
+
