@@ -32,14 +32,14 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     <flow name="delete-files">
         <quatrix:delete-files config-ref="Quatrix">
             <quatrix:ids>
-                <quatrix:id>#[flowVars.ids]</quatrix:id>
+                <quatrix:id>#[flowVars.ids.get(0)]</quatrix:id>
             </quatrix:ids>
         </quatrix:delete-files>
     </flow>
 
 
     <flow name="create-dir">
-        <quatrix:create-dir config-ref="Quatrix" target="#[flowVars.target]" dirName="#[flowVars.dirName]" resolve="true"/>
+        <quatrix:create-dir config-ref="Quatrix" target="#[flowVars.target]" dirName="#[flowVars.dirName]" resolve="#[flowVars.resolve]"/>
     </flow>
 
     <flow name="copy-files">

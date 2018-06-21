@@ -37,7 +37,7 @@
               scope="prototype">
         <entry key="filePath" value="" />
         <entry key="parentId" value="" />
-        <entry key="fileName" value="" />
+        <entry key="fileName" value-ref="randomShortString" />
         <entry key="resolveConflict" value="true" />
     </util:map>
 
@@ -52,9 +52,4 @@
               scope="prototype">
         <entry key="ids" value=""/>
     </util:map>
-
-    <util:list id="fileIds" value-type="java.lang.String">
-        <value>d0335328-7063-457d-b8c8-c0ae40225a99</value>
-    </util:list>
-
 </beans>
