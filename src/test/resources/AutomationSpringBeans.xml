@@ -24,7 +24,7 @@
 
     <util:map id="deleteFilesTestData" map-class="java.util.HashMap" key-type="java.lang.String" value-type="java.lang.Object"
               scope="prototype">
-        <entry key="ids" value="fileIds"/>
+        <entry key="ids" value=""/>
     </util:map>
 
     <util:list id="fileIds" value-type="java.lang.String">
