@@ -37,4 +37,17 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         </quatrix:delete-files>
     </flow>
 
+    <flow name="copy-files">
+        <quatrix:copy-files config-ref="Quatrix" target="#[flowVars.target]" resolve="#[flowVars.resolve]">
+            <quatrix:ids>
+                <quatrix:id>#[flowVars.ids.get(0)]</quatrix:id>
+            </quatrix:ids>
+        </quatrix:copy-files>
+    </flow>
+
+    <flow name="upload-file">
+        <quatrix:upload-file config-ref="Quatrix" filePath="#[flowVars.filePath]" parentId="#[flowVars.parentId]"
+                             fileName="#[flowVars.fileName]" resolveConflict="#[flowVars.resolveConflict]" />
+    </flow>
+
 </mule>
