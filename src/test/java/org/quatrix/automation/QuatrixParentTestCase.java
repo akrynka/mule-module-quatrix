@@ -11,7 +11,7 @@ public class QuatrixParentTestCase extends ConnectorTestCase {
     private static final Delay SETUP_DELAY = new Delay(TimeUnit.SECONDS, 5L);
 
     @Rule
-    public Timeout globalTimeout = new Timeout(10, TimeUnit.MINUTES);
+    public Timeout globalTimeout = new Timeout((int) TimeUnit.MINUTES.toMillis(10L));
 
 
     @Override
