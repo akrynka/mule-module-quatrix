@@ -4,8 +4,6 @@ import io.swagger.client.model.SessionLoginResp;
 
 import java.util.UUID;
 
-//@Data
-//@AllArgsConstructor
 public class Session {
 
     private final UUID id;

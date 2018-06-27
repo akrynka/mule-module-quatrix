@@ -5,9 +5,6 @@ import io.swagger.client.model.FileRenameResp;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-//@Getter
-//@EqualsAndHashCode
-//@ToString
 public class FileRenameResult {
 
     private UUID id;
@@ -15,9 +12,9 @@ public class FileRenameResult {
     private BigDecimal modified;
     private String name;
     private UUID parentId;
+    private Object metadata;
     private BigDecimal size;
     private String type;
-    private Object metadata;
     private BigDecimal operations;
     private String oldName;
 
@@ -41,16 +38,16 @@ public class FileRenameResult {
         return parentId;
     }
 
+    public Object getMetadata() {
+        return metadata;
+    }
+
     public BigDecimal getSize() {
         return size;
     }
 
     public String getType() {
         return type;
-    }
-
-    public Object getMetadata() {
-        return metadata;
     }
 
     public BigDecimal getOperations() {

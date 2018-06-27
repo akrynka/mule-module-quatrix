@@ -5,16 +5,13 @@ import io.swagger.client.model.FileResp;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-//@Getter
-//@EqualsAndHashCode
-//@ToString
 public class FileInfo {
 
     private UUID id;
-    private BigDecimal created;
-    private BigDecimal modified;
     private String name;
+    private BigDecimal modified;
     private UUID parentId;
+    private BigDecimal created;
     private BigDecimal size;
     private BigDecimal modifiedMs;
     private String type;
@@ -26,20 +23,20 @@ public class FileInfo {
         return id;
     }
 
-    public BigDecimal getCreated() {
-        return created;
+    public String getName() {
+        return name;
     }
 
     public BigDecimal getModified() {
         return modified;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public UUID getParentId() {
         return parentId;
+    }
+
+    public BigDecimal getCreated() {
+        return created;
     }
 
     public BigDecimal getSize() {

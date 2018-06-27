@@ -1,6 +1,5 @@
 package org.quatrix.model;
 
-import com.google.gson.annotations.SerializedName;
 import io.swagger.client.model.UploadFinalizeResp;
 
 import java.math.BigDecimal;

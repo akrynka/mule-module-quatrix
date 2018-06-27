@@ -5,12 +5,13 @@ import org.quatrix.api.QuatrixApiException;
 
 public class QuatrixThrowable {
 
-    public static <R> R throwNow(ApiException ex) throws QuatrixApiException {
+    private QuatrixThrowable() {}
+
+    public static <R> R throwNow(ApiException ex) {
         throw new QuatrixApiException(ex);
     }
 
-    public static <R> R throwNow(Throwable ex) throws QuatrixApiException {
+    public static <R> R throwNow(Throwable ex) {
         throw new QuatrixApiException(ex);
     }
-
 }

@@ -9,17 +9,14 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-//@Getter
-//@EqualsAndHashCode
-//@ToString
 public class FileMetadata {
     
     private UUID id;
     private BigDecimal gid;
     private BigDecimal uid;
     private BigDecimal created;
-    private BigDecimal modified;
     private String name;
+    private BigDecimal modified;
     private UUID parentId;
     private BigDecimal size;
     private String type;
@@ -44,12 +41,12 @@ public class FileMetadata {
         return created;
     }
 
-    public BigDecimal getModified() {
-        return modified;
-    }
-
     public String getName() {
         return name;
+    }
+
+    public BigDecimal getModified() {
+        return modified;
     }
 
     public UUID getParentId() {

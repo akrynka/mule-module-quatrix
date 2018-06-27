@@ -5,7 +5,6 @@ import io.swagger.client.model.IdsResp;
 import java.util.List;
 import java.util.UUID;
 
-//@Data
 public class FileIds {
 
     private final List<UUID> ids;

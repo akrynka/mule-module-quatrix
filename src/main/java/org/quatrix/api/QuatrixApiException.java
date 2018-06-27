@@ -5,12 +5,11 @@ import io.swagger.client.ApiException;
 import java.util.List;
 import java.util.Map;
 
-//@Getter
 public class QuatrixApiException extends RuntimeException {
 
-    private int code = 0;
-    private Map<String, List<String>> responseHeaders = null;
-    private String responseBody = null;
+    private final int code;
+    private final Map<String, List<String>> responseHeaders;
+    private final String responseBody;
 
     public QuatrixApiException(ApiException ex) {
         super(ex);
@@ -21,10 +20,9 @@ public class QuatrixApiException extends RuntimeException {
 
     public QuatrixApiException(Throwable cause) {
         super(cause);
-    }
-
-    public QuatrixApiException(String message) {
-        super(message);
+        this.code = 0;
+        this.responseHeaders = null;
+        this.responseBody = null;
     }
 
     public int getCode() {

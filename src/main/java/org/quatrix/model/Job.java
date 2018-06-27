@@ -4,7 +4,6 @@ import io.swagger.client.model.JobResp;
 
 import java.util.UUID;
 
-//@Data
 public class Job {
 
     private final UUID id;

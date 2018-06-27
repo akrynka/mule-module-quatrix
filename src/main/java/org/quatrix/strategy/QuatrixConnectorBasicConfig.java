@@ -9,7 +9,12 @@ package org.quatrix.strategy;
 
 import org.mule.api.ConnectionException;
 import org.mule.api.ConnectionExceptionCode;
-import org.mule.api.annotations.*;
+import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Connect;
+import org.mule.api.annotations.ConnectionIdentifier;
+import org.mule.api.annotations.Disconnect;
+import org.mule.api.annotations.TestConnectivity;
+import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.components.ConnectionManagement;
 import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Password;
@@ -29,10 +34,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author Aleksey K
  */
-@ConnectionManagement(configElementName = "config-type", friendlyName = "Basic Auth connection config")
-public class QuatrixConnectorConnectionStrategy {
+@ConnectionManagement(configElementName = "config", friendlyName = "Basic Auth connection config")
+public class QuatrixConnectorBasicConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(QuatrixConnectorConnectionStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuatrixConnectorBasicConfig.class);
 
 
     private QuatrixApi quatrixApi;
@@ -58,6 +63,14 @@ public class QuatrixConnectorConnectionStrategy {
     @Connect
     @TestConnectivity
     public void connect(@ConnectionKey String username, @Password String password) throws ConnectionException {
+        if (username == null) {
+            throw new ConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, "", "username required");
+        }
+
+        if (password == null) {
+            throw new ConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, "", "password required");
+        }
+
         final ApiConfig config = new ApiConfigBuilder()
                 .setBasePath(basePath)
                 .setKeepAliveCallDelay(keepAliveCallDelay)
@@ -70,7 +83,8 @@ public class QuatrixConnectorConnectionStrategy {
             Session session = quatrixApi.login();
             this.sessionId = session.getId().toString();
         } catch (QuatrixApiException e) {
-            throw new ConnectionException(ConnectionExceptionCode.UNKNOWN, "", e.getMessage());
+            logger.error("Login failed", e);
+            throw new ConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, "", e.getMessage());
         }
     }
 

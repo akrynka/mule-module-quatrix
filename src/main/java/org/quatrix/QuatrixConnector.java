@@ -10,8 +10,7 @@
  */
 package org.quatrix;
 
-import com.google.common.base.Function;
-import org.mule.api.annotations.ConnectionStrategy;
+import org.mule.api.annotations.Config;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.lifecycle.Stop;
@@ -23,13 +22,11 @@ import org.quatrix.model.FileMetadata;
 import org.quatrix.model.FileRenameResult;
 import org.quatrix.model.Job;
 import org.quatrix.model.UploadResult;
-import org.quatrix.model.*;
-import org.quatrix.strategy.QuatrixConnectorConnectionStrategy;
-import org.quatrix.util.CollectionUtils;
+import org.quatrix.strategy.QuatrixConnectorBasicConfig;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.Collections;
 import java.util.UUID;
 
 /**
@@ -37,7 +34,7 @@ import java.util.UUID;
  *
  * @author MuleSoft, Inc.
  */
-@Connector(name = "quatrix", schemaVersion = "1.0-SNAPSHOT", friendlyName = "Quatrix", minMuleVersion = "3.9.0")
+@Connector(name = "quatrix", friendlyName = "Quatrix")
 public class QuatrixConnector {
 
     private QuatrixApi quatrixApi;
@@ -45,8 +42,8 @@ public class QuatrixConnector {
     /**
      * Connection Strategy
      */
-    @ConnectionStrategy
-    QuatrixConnectorConnectionStrategy connectionStrategy;
+    @Config
+    QuatrixConnectorBasicConfig connectionStrategy;
 
     @Stop
     public void onStop() {
@@ -58,7 +55,7 @@ public class QuatrixConnector {
      *
      *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:home-metadata}
      *
-     * @param content if '1' then directory content will be included in response
+     * @param content if true then directory content will be included in response
      * @return {@link FileMetadata}
      * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
@@ -68,19 +65,33 @@ public class QuatrixConnector {
     }
 
     /**
+     * Get file meta data.
+     *
+     * {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:file-meta}
+     *
+     * @param fileId File id
+     * @param content if true then directory content will be included in response
+     * @return {@link FileMetadata}
+     */
+    @Processor
+    public FileMetadata fileMetadata(UUID fileId, @Default("true") Boolean content) {
+        return this.quatrixApi.getFileMetadata(fileId, content);
+    }
+
+    /**
      *  Rename file.
      *
      *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:rename-file}
      *
-     * @param uuid
+     * @param fileId
      * @param newFileName
      * @param resolve if 'true' then possible name conflict will be resolved automatically
      * @return {@link FileRenameResult}
      * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
-    public FileRenameResult renameFile(UUID uuid, String newFileName, @Default("true") Boolean resolve) {
-        return this.quatrixApi.renameFile(uuid, newFileName, resolve);
+    public FileRenameResult renameFile(UUID fileId, String newFileName, @Default("true") Boolean resolve) {
+        return this.quatrixApi.renameFile(fileId, newFileName, resolve);
     }
 
     /**
@@ -88,18 +99,13 @@ public class QuatrixConnector {
      *
      *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:delete-files}
      *
-     * @param ids
+     * @param fileId File id
      * @return {@link FileIds}
      * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
-    public FileIds deleteFiles(List<String> ids) {
-        return this.quatrixApi.deleteFiles(CollectionUtils.map(ids, new Function<String, UUID>() {
-            @Override
-            public UUID apply(String s) {
-                return UUID.fromString(s);
-            }
-        }));
+    public FileIds deleteFile(UUID fileId) {
+        return this.quatrixApi.deleteFile(fileId);
     }
 
     /**
@@ -107,18 +113,13 @@ public class QuatrixConnector {
      *
      *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:download-file}
      *
-     * @param fileIds File ids for download
+     * @param fileId File ids for download
      * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      * @return {@link File}
      */
     @Processor
-    public File downloadFile(List<String> fileIds) {
-        return this.quatrixApi.download(CollectionUtils.map(fileIds, new Function<String, UUID>() {
-            @Override
-            public UUID apply(String s) {
-                return UUID.fromString(s);
-            }
-        }));
+    public File downloadFile(UUID fileId) {
+        return this.quatrixApi.download(fileId);
     }
 
     /**
@@ -133,10 +134,10 @@ public class QuatrixConnector {
      * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
-    public UploadResult uploadFile(String filePath, String parentId, String fileName, boolean resolveConflict) {
+    public UploadResult uploadFile(String filePath, UUID parentId, String fileName, boolean resolveConflict) {
         return this.quatrixApi.upload(
             Paths.get(filePath).toFile(),
-            UUID.fromString(parentId),
+            parentId,
             fileName, resolveConflict
         );
     }
@@ -146,8 +147,8 @@ public class QuatrixConnector {
      *
      * {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:copy-files}
      *
-     * @param ids list of files
-     * @param target destination directory
+     * @param fileId list of files
+     * @param destDir destination directory
      * @param resolve if 'true' then possible name conflict will be resolved automatically
      *
      * @return {@link Job}
@@ -155,14 +156,10 @@ public class QuatrixConnector {
      * @throws org.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
-    public Job copyFiles(List<String> ids, String target, @Default("true") Boolean resolve) {
-        final List<UUID> uuids = CollectionUtils.map(ids, new Function<String, UUID>() {
-            @Override
-            public UUID apply(String s) {
-                return UUID.fromString(s);
-            }
-        });
-        return this.quatrixApi.copyFiles(uuids, UUID.fromString(target), resolve);
+    public Job copyFile(UUID fileId, UUID destDir, @Default("true") Boolean resolve) {
+        return this.quatrixApi.copyFiles(
+            Collections.singletonList(fileId), destDir, resolve
+        );
     }
 
     /**
@@ -184,7 +181,7 @@ public class QuatrixConnector {
     /**
      * Get Connection Strategy
      */
-    public QuatrixConnectorConnectionStrategy getConnectionStrategy() {
+    public QuatrixConnectorBasicConfig getConnectionStrategy() {
         return connectionStrategy;
     }
 
@@ -193,7 +190,7 @@ public class QuatrixConnector {
      *
      * @param connectionStrategy Connection Strategy
      */
-    public void setConnectionStrategy(QuatrixConnectorConnectionStrategy connectionStrategy) {
+    public void setConnectionStrategy(QuatrixConnectorBasicConfig connectionStrategy) {
         this.quatrixApi = connectionStrategy.getQuatrix();
         this.connectionStrategy = connectionStrategy;
     }

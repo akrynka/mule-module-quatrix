@@ -1,3 +1,15 @@
-<!-- BEGIN_INCLUDE(quatrix:homeMetadata) -->
+<!-- BEGIN_INCLUDE(quatrix:home-metadata) -->
     <quatrix:home-metadata config-ref="Quatrix" content="#[map-payload:content]" />
-<!-- END_INCLUDE(quatrix:homeMetadata) -->
+<!-- END_INCLUDE(quatrix:home-metadata) -->
+
+<!-- BEGIN_INCLUDE(quatrix:file-metadata) -->
+    <quatrix:file-metadata config-ref="Quatrix" fileId="#[map-payload:fileId]" content="#[map-payload:content]" />
+<!-- END_INCLUDE(quatrix:file-metadata) -->
+
+<!-- BEGIN_INCLUDE(quatrix:rename-file) -->
+    <quatrix:rename-file config-ref="Quatrix" fileId="#[map-payload:fileId]" newFileName="#[map-payload:newFileName]" resolve="#[map-payload:resolve]" />
+<!-- END_INCLUDE(quatrix:rename-file) -->
+
+<!-- BEGIN_INCLUDE(quatrix:delete-file) -->
+    <quatrix:delete-file config-ref="Quatrix" fileId="#[map-payload:fileId]"  />
+<!-- END_INCLUDE(quatrix:delete-file) -->
