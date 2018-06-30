@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertNotNull;
 
-public class CopyFileTestCaseIT extends QuatrixAbstractTestCases {
+public class CopyFileTestCase extends QuatrixAbstractTestCases {
 
     private File testFile;
     private UUID targetDirId;

@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import java.io.File;
 
-public class FileDeleteTestCaseIT extends QuatrixAbstractTestCases {
+public class FileDeleteTestCase extends QuatrixAbstractTestCases {
 
     private File testFile;
     private UploadResult uploadedFile;

@@ -10,7 +10,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class CreateDirTestCaseIT extends QuatrixAbstractTestCases {
+public class CreateDirTestCase extends QuatrixAbstractTestCases {
     private UUID homeDirUuid;
     private UUID newDirUuid;
     private String newDirName = String.format("%s.test", UUID.randomUUID().toString());

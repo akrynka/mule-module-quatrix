@@ -11,7 +11,7 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class FileRenameTestCaseIT extends QuatrixAbstractTestCases {
+public class FileRenameTestCase extends QuatrixAbstractTestCases {
 
     private File testFile;
     private UploadResult uploadResult;

@@ -4,7 +4,7 @@ import com.quatrix.api.model.FileMetadata;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class FileMetadataTestCaseIT extends QuatrixAbstractTestCases {
+public class FileMetadataTestCase extends QuatrixAbstractTestCases {
 
     @Test
     public void testGetHomeDirMetadata() throws Exception {

@@ -10,7 +10,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class UploadFileTestCaseIT extends QuatrixAbstractTestCases {
+public class UploadFileTestCase extends QuatrixAbstractTestCases {
 
     private UUID targetDirId;
     private File testFile;

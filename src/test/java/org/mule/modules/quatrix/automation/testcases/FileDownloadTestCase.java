@@ -10,7 +10,7 @@ import org.mule.util.FileUtils;
 import java.io.File;
 import java.util.UUID;
 
-public class FileDownloadTestCaseIT extends QuatrixAbstractTestCases {
+public class FileDownloadTestCase extends QuatrixAbstractTestCases {
 
     private File testFile;
     private long testFileCrc;
