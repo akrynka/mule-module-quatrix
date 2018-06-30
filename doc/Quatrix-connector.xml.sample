@@ -13,3 +13,19 @@
 <!-- BEGIN_INCLUDE(quatrix:delete-file) -->
     <quatrix:delete-file config-ref="Quatrix" fileId="#[map-payload:fileId]"  />
 <!-- END_INCLUDE(quatrix:delete-file) -->
+
+<!-- BEGIN_INCLUDE(quatrix:download-file) -->
+    <quatrix:download-file config-ref="Quatrix" fileId="#[map-payload:fileId]"  />
+<!-- END_INCLUDE(quatrix:download-file) -->
+
+<!-- BEGIN_INCLUDE(quatrix:upload-file) -->
+    <quatrix:upload-file config-ref="Quatrix" filePath="#[map-payload:filePath]" parentId="#[map-payload:fileId]" fileName="#[map-payload:fileName]" resolve="true" />
+<!-- END_INCLUDE(quatrix:upload-file) -->
+
+<!-- BEGIN_INCLUDE(quatrix:copy-file) -->
+    <quatrix:copy-file config-ref="Quatrix" fileId="#[map-payload:fileId]" destDir="#[map-payload:destDir]" resolve="true" />
+<!-- END_INCLUDE(quatrix:copy-file) -->
+
+<!-- BEGIN_INCLUDE(quatrix:create-dir) -->
+    <quatrix:create-dir config-ref="Quatrix" fileId="#[map-payload:fileId]" destDir="#[map-payload:destDir]" resolve="true" />
+<!-- END_INCLUDE(quatrix:create-dir) -->
