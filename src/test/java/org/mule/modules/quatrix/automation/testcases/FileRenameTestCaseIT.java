@@ -1,10 +1,10 @@
 package org.mule.modules.quatrix.automation.testcases;
 
+import com.quatrix.api.model.FileRenameResult;
+import com.quatrix.api.model.UploadResult;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.modules.quatrix.model.FileRenameResult;
-import org.mule.modules.quatrix.model.UploadResult;
 
 import java.io.File;
 

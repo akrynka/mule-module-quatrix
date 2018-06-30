@@ -1,8 +1,8 @@
 package org.mule.modules.quatrix.automation.testcases;
 
+import com.quatrix.api.model.FileMetadata;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mule.modules.quatrix.model.FileMetadata;
 
 public class FileMetadataTestCaseIT extends QuatrixAbstractTestCases {
 

@@ -7,6 +7,12 @@
 
 package org.mule.modules.quatrix.strategy;
 
+import com.quatrix.api.QuatrixApi;
+import com.quatrix.api.QuatrixApiException;
+import com.quatrix.api.QuatrixApiImpl;
+import com.quatrix.api.config.ApiConfig;
+import com.quatrix.api.config.ApiConfigBuilder;
+import com.quatrix.api.model.Session;
 import org.mule.api.ConnectionException;
 import org.mule.api.ConnectionExceptionCode;
 import org.mule.api.annotations.Configurable;
@@ -20,12 +26,6 @@ import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
-import org.mule.modules.quatrix.api.QuatrixApi;
-import org.mule.modules.quatrix.api.QuatrixApiException;
-import org.mule.modules.quatrix.api.QuatrixApiImpl;
-import org.mule.modules.quatrix.api.config.ApiConfig;
-import org.mule.modules.quatrix.api.config.ApiConfigBuilder;
-import org.mule.modules.quatrix.model.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

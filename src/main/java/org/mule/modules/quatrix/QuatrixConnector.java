@@ -7,20 +7,20 @@
 
 package org.mule.modules.quatrix;
 
+import com.quatrix.api.QuatrixApi;
+import com.quatrix.api.QuatrixApiException;
+import com.quatrix.api.model.FileIds;
+import com.quatrix.api.model.FileInfo;
+import com.quatrix.api.model.FileMetadata;
+import com.quatrix.api.model.FileRenameResult;
+import com.quatrix.api.model.Job;
+import com.quatrix.api.model.UploadResult;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.Config;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.annotations.param.Default;
-import org.mule.modules.quatrix.api.QuatrixApi;
-import org.mule.modules.quatrix.api.QuatrixApiException;
-import org.mule.modules.quatrix.model.FileIds;
-import org.mule.modules.quatrix.model.FileInfo;
-import org.mule.modules.quatrix.model.FileMetadata;
-import org.mule.modules.quatrix.model.FileRenameResult;
-import org.mule.modules.quatrix.model.Job;
-import org.mule.modules.quatrix.model.UploadResult;
 import org.mule.modules.quatrix.strategy.QuatrixConnectorBasicConfig;
 
 import java.io.File;
@@ -60,7 +60,7 @@ public class QuatrixConnector {
      *
      * @param content if true then directory content will be included in response
      * @return {@link FileMetadata}
-     * @throws org.mule.modules.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
+     * @throws com.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
     public FileMetadata homeMetadata(@Default("true") boolean content) throws QuatrixApiException {
@@ -90,7 +90,7 @@ public class QuatrixConnector {
      * @param newFileName result file or directory name
      * @param resolve if 'true' then possible name conflict will be resolved automatically
      * @return {@link FileRenameResult}
-     * @throws org.mule.modules.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
+     * @throws com.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
     public FileRenameResult renameFile(String fileId, String newFileName, @Default("true") Boolean resolve)
@@ -105,7 +105,7 @@ public class QuatrixConnector {
      *
      * @param fileId File id
      * @return {@link FileIds}
-     * @throws org.mule.modules.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
+     * @throws com.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
     public FileIds deleteFile(String fileId) throws QuatrixApiException {
@@ -118,7 +118,7 @@ public class QuatrixConnector {
      *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:download-file}
      *
      * @param fileId File ids for download
-     * @throws org.mule.modules.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
+     * @throws com.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      * @return {@link File}
      */
     @Processor
@@ -135,7 +135,7 @@ public class QuatrixConnector {
      * @param parentId Id of target folder where file should be placed
      * @param fileName File name
      * @param resolve if true then API automatically resolve any file name conflicts
-     * @throws org.mule.modules.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
+     * @throws com.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
     public UploadResult uploadFile(String filePath, String parentId, String fileName, @Default("true") boolean resolve)
@@ -159,7 +159,7 @@ public class QuatrixConnector {
      *
      * @return {@link Job}
      *
-     * @throws org.mule.modules.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
+     * @throws com.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
     public Job copyFile(String fileId, String destDir, @Default("true") boolean resolve)
@@ -179,7 +179,7 @@ public class QuatrixConnector {
      * @param dirName name directory
      * @param resolve if 'true' then possible name conflict will be resolved automatically
      * @return {@link FileInfo}
-     * @throws org.mule.modules.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
+     * @throws com.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
     public FileInfo createDir(String target, String dirName, @Default("true") boolean resolve)

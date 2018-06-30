@@ -1,9 +1,9 @@
 package org.mule.modules.quatrix.automation.testcases;
 
+import com.quatrix.api.model.FileInfo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.modules.quatrix.model.FileInfo;
 
 import java.util.UUID;
 

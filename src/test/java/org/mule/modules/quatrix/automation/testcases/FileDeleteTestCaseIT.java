@@ -1,11 +1,11 @@
 package org.mule.modules.quatrix.automation.testcases;
 
+import com.quatrix.api.model.FileIds;
+import com.quatrix.api.model.FileMetadata;
+import com.quatrix.api.model.UploadResult;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.modules.quatrix.model.FileIds;
-import org.mule.modules.quatrix.model.FileMetadata;
-import org.mule.modules.quatrix.model.UploadResult;
 
 import java.io.File;
 
