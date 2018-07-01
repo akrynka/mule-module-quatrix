@@ -12,7 +12,6 @@ import com.quatrix.api.QuatrixApiException;
 import com.quatrix.api.QuatrixApiImpl;
 import com.quatrix.api.config.ApiConfig;
 import com.quatrix.api.config.ApiConfigBuilder;
-import com.quatrix.api.model.Session;
 import org.mule.api.ConnectionException;
 import org.mule.api.ConnectionExceptionCode;
 import org.mule.api.annotations.Configurable;
@@ -35,13 +34,11 @@ import org.slf4j.LoggerFactory;
  * @author Aleksey K
  */
 @ConnectionManagement(friendlyName = "Basic Auth connection config")
-public class QuatrixConnectorBasicConfig {
+public class QuatrixBasicConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(QuatrixConnectorBasicConfig.class);
-
+    private static final Logger logger = LoggerFactory.getLogger(QuatrixBasicConfig.class);
 
     private QuatrixApi quatrixApi;
-    private String sessionId;
 
     @Configurable
     @FriendlyName("Quatrix API url")
@@ -62,6 +59,10 @@ public class QuatrixConnectorBasicConfig {
     @Connect
     @TestConnectivity
     public void connect(@ConnectionKey String username, @Password String password) throws ConnectionException {
+        if (basePath == null) {
+            throw new ConnectionException(ConnectionExceptionCode.UNKNOWN_HOST, "", "basePath required");
+        }
+
         if (username == null) {
             throw new ConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, "", "username required");
         }
@@ -79,8 +80,7 @@ public class QuatrixConnectorBasicConfig {
 
         this.quatrixApi = new QuatrixApiImpl(config);
         try {
-            Session session = quatrixApi.login();
-            this.sessionId = session.getId().toString();
+            quatrixApi.login();
         } catch (QuatrixApiException e) {
             logger.error("Login failed", e);
             throw new ConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, "", e.getMessage());
@@ -95,18 +95,21 @@ public class QuatrixConnectorBasicConfig {
             logger.error("Error during disconnect", e);
         } finally {
             this.quatrixApi = null;
-            this.sessionId = null;
         }
     }
 
     @ValidateConnection
     public boolean isConnected() {
-        return sessionId != null;
+        return quatrixApi != null && quatrixApi.session() != null;
     }
 
     @ConnectionIdentifier
     public String connectionId() {
-        return sessionId;
+        if (quatrixApi != null && quatrixApi.session() != null) {
+            return quatrixApi.session().getId().toString();
+        }
+
+        return null;
     }
 
     public String getBasePath() {

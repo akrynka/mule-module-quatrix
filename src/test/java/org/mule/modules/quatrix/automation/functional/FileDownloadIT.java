@@ -1,4 +1,4 @@
-package org.mule.modules.quatrix.automation.testcases;
+package org.mule.modules.quatrix.automation.functional;
 
 import com.quatrix.api.model.FileMetadata;
 import org.junit.After;
@@ -10,7 +10,7 @@ import org.mule.util.FileUtils;
 import java.io.File;
 import java.util.UUID;
 
-public class FileDownloadTestCase extends QuatrixAbstractTestCases {
+public class FileDownloadIT extends QuatrixConnectorAbstractTestCase {
 
     private File testFile;
     private long testFileCrc;

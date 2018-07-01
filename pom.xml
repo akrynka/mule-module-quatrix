@@ -36,9 +36,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-connector-test</artifactId>
-            <version>${connector.test.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -55,6 +55,7 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+
            <!-- <plugin>
                 <groupId>org.mule.certification</groupId>
                 <artifactId>project-structure-validation</artifactId>
@@ -83,11 +84,11 @@
             <url>http://repository.mulesoft.org/snapshots/</url>
             <layout>default</layout>
         </repository>
-        <repository>
+        <!--<repository>
             <id>project-repo</id>
             <name>Local project repo</name>
             <url>file://${basedir}/lib</url>
-        </repository>
+        </repository>-->
     </repositories>
 
 </project>

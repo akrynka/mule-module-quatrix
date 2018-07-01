@@ -1,10 +1,10 @@
-package org.mule.modules.quatrix.automation.testcases;
+package org.mule.modules.quatrix.automation.functional;
 
 import com.quatrix.api.model.FileMetadata;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class FileMetadataTestCase extends QuatrixAbstractTestCases {
+public class FileMetadataIT extends QuatrixConnectorAbstractTestCase {
 
     @Test
     public void testGetHomeDirMetadata() throws Exception {

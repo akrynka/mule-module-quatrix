@@ -1,4 +1,4 @@
-package org.mule.modules.quatrix.automation.testcases;
+package org.mule.modules.quatrix.automation.functional;
 
 import com.quatrix.api.model.FileInfo;
 import org.junit.After;
@@ -10,7 +10,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class CreateDirTestCase extends QuatrixAbstractTestCases {
+public class CreateDirIT extends QuatrixConnectorAbstractTestCase {
     private UUID homeDirUuid;
     private UUID newDirUuid;
     private String newDirName = String.format("%s.test", UUID.randomUUID().toString());

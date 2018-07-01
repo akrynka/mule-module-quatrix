@@ -1,4 +1,4 @@
-package org.mule.modules.quatrix.automation.testcases;
+package org.mule.modules.quatrix.automation.functional;
 
 import com.quatrix.api.model.UploadResult;
 import org.junit.After;
@@ -10,7 +10,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class UploadFileTestCase extends QuatrixAbstractTestCases {
+public class UploadFileIT extends QuatrixConnectorAbstractTestCase {
 
     private UUID targetDirId;
     private File testFile;

@@ -1,4 +1,4 @@
-package org.mule.modules.quatrix.automation.testcases;
+package org.mule.modules.quatrix.automation.functional;
 
 import com.quatrix.api.model.FileRenameResult;
 import com.quatrix.api.model.UploadResult;
@@ -11,7 +11,7 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class FileRenameTestCase extends QuatrixAbstractTestCases {
+public class FileRenameIT extends QuatrixConnectorAbstractTestCase {
 
     private File testFile;
     private UploadResult uploadResult;

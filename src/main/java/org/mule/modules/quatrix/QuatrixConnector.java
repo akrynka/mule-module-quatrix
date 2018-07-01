@@ -21,7 +21,7 @@ import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.annotations.param.Default;
-import org.mule.modules.quatrix.strategy.QuatrixConnectorBasicConfig;
+import org.mule.modules.quatrix.strategy.QuatrixBasicConfig;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -42,7 +42,7 @@ public class QuatrixConnector {
      * Connection Strategy
      */
     @Config
-    QuatrixConnectorBasicConfig connectionStrategy;
+    QuatrixBasicConfig connectionStrategy;
 
     @Stop
     public void onStop() throws MuleException {
@@ -191,7 +191,7 @@ public class QuatrixConnector {
     /**
      * Get Connection Strategy
      */
-    public QuatrixConnectorBasicConfig getConnectionStrategy() {
+    public QuatrixBasicConfig getConnectionStrategy() {
         return connectionStrategy;
     }
 
@@ -200,7 +200,7 @@ public class QuatrixConnector {
      *
      * @param connectionStrategy Connection Strategy
      */
-    public void setConnectionStrategy(QuatrixConnectorBasicConfig connectionStrategy) {
+    public void setConnectionStrategy(QuatrixBasicConfig connectionStrategy) {
         this.quatrixApi = connectionStrategy.getQuatrix();
         this.connectionStrategy = connectionStrategy;
     }

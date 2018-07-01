@@ -1,4 +1,4 @@
-package org.mule.modules.quatrix.automation.testcases;
+package org.mule.modules.quatrix.automation.functional;
 
 import com.quatrix.api.model.FileMetadata;
 import com.quatrix.api.model.UploadResult;
@@ -15,12 +15,12 @@ import java.util.UUID;
 /**
  * Base class for test cases.
  */
-public abstract class QuatrixAbstractTestCases extends AbstractTestCase<QuatrixConnector> {
+public abstract class QuatrixConnectorAbstractTestCase extends AbstractTestCase<QuatrixConnector> {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    public QuatrixAbstractTestCases() {
+    public QuatrixConnectorAbstractTestCase() {
         super(QuatrixConnector.class);
     }
 

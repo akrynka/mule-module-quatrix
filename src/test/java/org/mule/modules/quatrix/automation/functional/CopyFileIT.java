@@ -1,4 +1,4 @@
-package org.mule.modules.quatrix.automation.testcases;
+package org.mule.modules.quatrix.automation.functional;
 
 import com.quatrix.api.model.FileInfo;
 import com.quatrix.api.model.Job;
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertNotNull;
 
-public class CopyFileTestCase extends QuatrixAbstractTestCases {
+public class CopyFileIT extends QuatrixConnectorAbstractTestCase {
 
     private File testFile;
     private UUID targetDirId;

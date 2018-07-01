@@ -1,4 +1,4 @@
-package org.mule.modules.quatrix.automation.testcases;
+package org.mule.modules.quatrix.automation.functional;
 
 import com.quatrix.api.model.FileIds;
 import com.quatrix.api.model.FileMetadata;
@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import java.io.File;
 
-public class FileDeleteTestCase extends QuatrixAbstractTestCases {
+public class FileDeleteIT extends QuatrixConnectorAbstractTestCase {
 
     private File testFile;
     private UploadResult uploadedFile;
