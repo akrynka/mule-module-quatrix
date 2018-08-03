@@ -32,7 +32,7 @@ public class FunctionalTestSuite {
     }
 
     @AfterClass
-    public static void shutdownSuite() throws Exception{
+    public static void shutdownSuite() throws Exception {
         ConnectorTestContext.shutDown();
     }
 }

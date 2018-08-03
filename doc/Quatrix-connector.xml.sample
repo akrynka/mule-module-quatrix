@@ -27,5 +27,5 @@
 <!-- END_INCLUDE(quatrix:copy-file) -->
 
 <!-- BEGIN_INCLUDE(quatrix:create-dir) -->
-    <quatrix:create-dir config-ref="Quatrix" fileId="#[map-payload:fileId]" destDir="#[map-payload:destDir]" resolve="true" />
+    <quatrix:create-dir config-ref="Quatrix" target="#[map-payload:fileId]" dirName="#[map-payload:dirName]" resolve="true" />
 <!-- END_INCLUDE(quatrix:create-dir) -->

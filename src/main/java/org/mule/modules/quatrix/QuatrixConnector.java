@@ -75,6 +75,7 @@ public class QuatrixConnector {
      * @param fileId File or directory id
      * @param content if true then directory content will be included in response
      * @return {@link FileMetadata}
+     * @throws QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
     public FileMetadata fileMetadata(String fileId, @Default("true") boolean content) throws QuatrixApiException {
@@ -135,6 +136,7 @@ public class QuatrixConnector {
      * @param parentId Id of target folder where file should be placed
      * @param fileName File name
      * @param resolve if true then API automatically resolve any file name conflicts
+     * @return {@link UploadResult} uploaded file information
      * @throws com.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
      */
     @Processor
@@ -175,8 +177,8 @@ public class QuatrixConnector {
      *
      *  {@sample.xml ../../../doc/Quatrix-connector.xml.sample quatrix:create-dir}
      *
-     * @param target destination directory
-     * @param dirName name directory
+     * @param target destination directory id
+     * @param dirName name of new directory
      * @param resolve if 'true' then possible name conflict will be resolved automatically
      * @return {@link FileInfo}
      * @throws com.quatrix.api.QuatrixApiException if Quatrix API is not available or network issues
